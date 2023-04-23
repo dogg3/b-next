@@ -3,11 +3,12 @@ import React, {useState} from 'react';
 
 export const ServiceType = {
 	WinterStay: {
-		label: "vinterplats",
-		prices: {
-			outdoor: 500,
-			inside: 1100,
-		}
+		label: "Placeringar",
+		priceType: "SQM",
+		variants: {
+			outdoor: {price: 500, label: "Utomhus", priceType: "SQM"},
+			inside: {price: 1100, label: "Inomhus", priceType: "SQM"},
+		},
 	},
 	EngineConservation: {
 		label: "Konservering av motorer, exklusive glykol",
@@ -52,8 +53,9 @@ export const ServiceType = {
 	},
 };
 
+
 const sqmPriceFun = (sqm, price) => {
-	return sqm * price
+	return parseInt(sqm * price);
 }
 
 export const BoatForm = () => {
@@ -61,13 +63,15 @@ export const BoatForm = () => {
 	const [boatWidth, setBoatWidth] = useState(0);
 
 	//PriceObjects 
-	const [isIndoors, setIsIndoors] = useState(true);
-	const [isOutdoors, setIsOutdoors] = useState(false);
 	const [priceObject, setPriceObject] = useState([])
-	const [totPrice, setTotPrice] = useState(0)
-
 	const [unitCounts, setUnitCounts] = useState({});
 
+	function clean(str) {
+		return parseFloat(str.replace(",", "."));
+	}
+
+
+	// handleUnitCount is for unit pricetypes
 	const handleUnitCount = async (event) => {
 		const key = event.target.name;
 		const count = event.target.value;
@@ -83,21 +87,35 @@ export const BoatForm = () => {
 		});
 	}
 
+	// jobs 
+	const [variants, setVariants] = useState([])
+	const handleVariant = async (event) => {
+		if (boatLength === 0 || boatWidth === 0) {
+			alert("Du måste skriva in båtlängd och båtbredd om den inte populeras.");
+			return false;
+		}
+		const variantKeyId = event.target.value;
+		const parts = variantKeyId.split(".");
+		let serviceTypeKey = parts[0]
+		let variantId = parts[1]
+		let sqm = sqmFunc(boatLength, boatWidth)
+		let jobPrice = Math.round(ServiceType[serviceTypeKey].variants[variantId].price * sqm);
+		let productPrice = ServiceType[serviceTypeKey].variants[variantId].price;
+		let label = ServiceType[serviceTypeKey].variants[variantId].label;
+		let priceType = ServiceType[serviceTypeKey].priceType;
+		let job = {
+			id: serviceTypeKey,
+			variantId: variantId,
+			label: label,
+			price: jobPrice,
+			productPrice: productPrice,
+			priceType: priceType,
 
-	function clean(str) {
-		return parseFloat(str.replace(",", "."));
+		}
+		updateOrCreateJob(job);
 	}
 
-	//Handlers
-	const handleIndoorsChange = (event) => {
-		setIsIndoors(event.target.checked);
-		setIsOutdoors(!event.target.checked);
-	};
-	const handleOutdoorsChange = (event) => {
-		setIsOutdoors(event.target.checked);
-		setIsIndoors(!event.target.checked);
-	};
-
+	// This is for sqm pricetypes aka checkboxes
 	const handlePriceObject = async (event) => {
 		const value = event.target.value;
 		const isChecked = event.target.checked;
@@ -108,15 +126,13 @@ export const BoatForm = () => {
 			}
 		}
 		if (!isChecked) {
-			//	pop
 			setJobs(prevState => prevState.filter(v => v.id !== value))
-
 		}
 		setPriceObject((prev) => isChecked ? [...prev, value] : prev.filter((v) => v !== value));
 	}
+
 	// {id:'serrvicetypeid', price: int}
 	const [jobs, setJobs] = useState([]);
-
 
 	const updateTotPrice = (serviceTypeKey, unitcounts) => {
 		let serviceType = ServiceType[serviceTypeKey];
@@ -124,12 +140,18 @@ export const BoatForm = () => {
 		switch (serviceType.priceType) {
 			case "SQM":
 				if (boatLength === 0 || boatWidth === 0) {
-					alert("Please set boat length and width in order to calculate price.");
+					alert("Du måste skriva in båtlängd och båtbredd om den inte populeras.");
 					return false;
 				}
 				let sqm = sqmFunc(boatLength * boatWidth);
-				let price = sqmPriceFun(sqm, serviceType.price);
-				job = {id: serviceTypeKey, price: price};
+				let pr = sqmPriceFun(sqm, serviceType.price);
+				job = {
+					id: serviceTypeKey,
+					price: pr,
+					label: serviceType.label,
+					productPrice: serviceType.price,
+					priceType: serviceType.priceType,
+				};
 				break;
 			case "unit":
 				let unitprince = 0
@@ -139,25 +161,33 @@ export const BoatForm = () => {
 				if (unitprince === 0) {
 					return false;
 				}
-				console.log("unitpridce", unitprince)
-				job = {id: serviceTypeKey, price: unitprince};
+				job = {
+					id: serviceTypeKey,
+					price: unitprince,
+					label: serviceType.label,
+					productPrice: serviceType.price,
+					priceType: serviceType.priceType,
+				};
 				break;
 		}
+
+		updateOrCreateJob(job)
+		return true;
+	}
+
+	const updateOrCreateJob = (job) => {
 		setJobs(prevItems => {
 			const index = prevItems.findIndex(item => item.id === job.id);
 			if (index === -1) {
 				// If no job with the same id exists, add the new job with the id property
 				return [...prevItems, job];
 			} else {
-				// If a job with the same id exists, update it with the new price
+				// If a job with the same id exists, overwrite it with the new job object
 				const updatedItems = [...prevItems];
-				updatedItems[index].price = job.price;
+				updatedItems[index] = job;
 				return updatedItems;
 			}
-		});
-
-		setTotPrice(job.price + totPrice);
-		return true;
+		})
 	}
 
 	const [name, setName] = useState('');
@@ -167,30 +197,26 @@ export const BoatForm = () => {
 		event.preventDefault();
 		if (!boatModel) {
 			alert("Båtmodell är obligatoriskt att fylla i!")
+			return
 		}
 		if (!boatWidth) {
 			alert("Båtbredd obligatoriskt att fylla i!")
+			return
 		}
 		if (!boatLength) {
 			alert("Båtlängd är obligatoriskt att fylla i!")
+			return
 		}
 
 		const jobsCopied = jobs.slice();
 
 		jobsCopied.map(job => {
-			job.label = ServiceType[job.id].label;
 			if (ServiceType[job.id].priceType == "unit") {
 				job.amount = unitCounts[job.id]
 				return job;
 			}
 			return job;
-		})	
-		
-		// add winterystay to jobs
-		let WinterTypePrice = isIndoors ? ServiceType.WinterStay.prices.inside : ServiceType.WinterStay.prices.outside;
-		let WinterTypeLabel = isIndoors ? "Inomhus" : "Utomhus";
-		let winterType = {id: "WinterType", price: WinterTypePrice, label: WinterTypeLabel}
-		jobsCopied.push(winterType)
+		})
 
 		const response = await fetch('/api/submit', {
 			method: 'POST', headers: {
@@ -239,7 +265,7 @@ export const BoatForm = () => {
 
 
 	const sqmFunc = (length, width) => {
-		return Math.round((clean(boatLength) + 0.5) * (clean(boatWidth) + 0.5))
+		return Math.round((clean(boatLength)) * (1 + clean(boatWidth)))
 	}
 	return (<div className="p-4 bg-gray-100">
 		{/*Search boat form*/}
@@ -258,13 +284,14 @@ export const BoatForm = () => {
 				</button>
 			</form>
 			<ul className="mt-4 max-h-60 overflow-y-auto">
-				{searchResults.map((result) => (
-					<li className={"cursor-pointer hover:bg-gray-100"} key={result.ItemId}
-						onClick={() => handleItemClick({
-							itemId: result.ItemId, brandName: result.BrandName, modelName: result.ModelName
-						})}>
-						{result.BrandName} {result.ModelName}
-					</li>))}
+				{searchResults.map((result) => (<li className={"cursor-pointer hover:bg-gray-100"} key={result.ItemId}
+													onClick={() => handleItemClick({
+														itemId: result.ItemId,
+														brandName: result.BrandName,
+														modelName: result.ModelName
+													})}>
+					{result.BrandName} {result.ModelName}
+				</li>))}
 			</ul>
 		</div>
 		<div className={"h-[20px]"}/>
@@ -314,114 +341,88 @@ export const BoatForm = () => {
 					required
 				/>
 			</label>
-			<label className="flex flex-col">
-				<span className="mb-1">Placering:</span>
-				<div className="flex space-x-4">
-					<label className="flex items-center">
-						<input
-							type="checkbox"
-							name="location"
-							value="outdoors"
-							checked={isOutdoors}
-							onChange={handleOutdoorsChange}
-							className="mr-2"
-						/>
-						Utomhus
-					</label>
-					<label className="flex items-center">
-						<input
-							type="checkbox"
-							name="location"
-							value="indoors"
-							checked={isIndoors}
-							onChange={handleIndoorsChange}
-							className="mr-2"
-						/>
-						Inomhus
-					</label>
-				</div>
-			</label>
-			{Object.entries(ServiceType).map(([key, value]) => (
-				<div key={key} className="flex items-center space-x-2">
-					<label className="flex items-center">
-						{value.priceType === "SQM" && (<input
-							type="checkbox"
-							name={key}
-							value={key}
-							checked={priceObject.includes(key)}
-							onChange={handlePriceObject}
-							className="mr-2"
-						/>)}
-
-						{
-							value.label != "vinterplats" ?
-								value.label
-								: ""
-						}
-						{value.priceType === "unit" && (<div>
-							<select
-								className={"mx-2 border-2 border-solid border-black"}
+			{Object.entries(ServiceType).map(([key, value]) => (<div key={key} className="flex items-center space-x-2">
+				<label className="flex items-center">
+					{value.priceType === "SQM" && value.variants ? <div className="flex flex-col">
+							{/*IF HAS VARIANTS*/}
+							{value.label}
+							{Object.entries(value.variants).map(([variantKey, variant]) => (
+								<label className="flex flex-row" key={variantKey}>
+									<div className="flex space-x-4">
+										<label className="flex items-center">
+											<input
+												type="checkbox"
+												name={`${key}.${variantKey}`}
+												value={`${key}.${variantKey}`}
+												checked={jobs.some(job => job.id === key && job.variantId === variantKey)}
+												onChange={handleVariant}
+												className="mr-2"
+											/>
+											{variant.label}
+										</label>
+									</div>
+								</label>
+							))}
+						</div> : // IF SQM PRICETYPE 
+						value.priceType === "SQM" && <label>
+							<input
+								type="checkbox"
 								name={key}
-								value={unitCounts[key]}
-								onChange={handleUnitCount}
-							>
-								<option value={0}>0</option>
-								<option value={1}>1</option>
-								<option value={2}>2</option>
-								<option value={3}>3</option>
-								<option value={4}>4</option>
-								<option value={5}>5</option>
-							</select>
-						</div>)}
-					</label>
-				</div>))}
+								value={key}
+								checked={priceObject.includes(key)}
+								onChange={handlePriceObject}
+								className="mr-2"
+							/>
+							{value.label}
+						</label>}
+
+					{value.priceType === "unit" && <label className="flex flex-row">
+						<select
+							className={"mx-2 border-2 border-solid border-black"}
+							name={key}
+							value={unitCounts[key]}
+							onChange={handleUnitCount}
+						>
+							<option value={0}>0</option>
+							<option value={1}>1</option>
+							<option value={2}>2</option>
+							<option value={3}>3</option>
+							<option value={4}>4</option>
+							<option value={5}>5</option>
+						</select>
+						{value.label}
+					</label>}
+				</label>
+			</div>))}
 		</form>
 
-		{/*OUTPUT PRICE AREA*/}
+		OUTPUT PRICE AREA
 		<div className="mb-4">
 			<h1 className="text-2xl font-bold mb-2">PRIS</h1>
-			{/*TYPE OF WINTERSTAY*/}
-
 			{boatWidth != 0 && boatLength != 0 &&
-				<span className="italic mb-[20px]">kvm = ({boatLength} meter längd + 0.5) * ({boatWidth} meter bredd + 0.5) = {sqmFunc(boatLength, boatWidth)} 
-				</span>
-			}
-			<div className={"flex flex-row justify-between"}>
-				Vinterförvaring {
-				isIndoors ? "inomus" : "utomhus"
-			}
-				<div>{isIndoors ? ServiceType.WinterStay.prices.inside : ServiceType.WinterStay.prices.outdoor} SEK</div>
-			</div>
-
-			{jobs.map((field) => (<div key={field.id} className="flex justify-between">
-				{ServiceType[field.id].priceType == "SQM" && (
-					<div className={"flex flex-row justify-between w-full"}>
-						<span>{ServiceType[field.id].label} - {ServiceType[field.id].price} SEK per {sqmFunc(boatLength, boatWidth)} kvm</span>
-						<span>{field.price} SEK</span>
-					</div>)
-				}
-				{ServiceType[field.id].priceType == "unit" && (
-					<div className={"flex flex-row justify-between w-full"}>
-						<span>{ServiceType[field.id].label} - {ServiceType[field.id].price} SEK à {unitCounts[field.id]} enhet(er)</span>
-						<span>{field.price} SEK</span>
-					</div>)
-				}
+				<span
+					className="italic mb-[20px]">kvm = ({boatLength} meter) * ({boatWidth} meter bredd + 1) = {sqmFunc(boatLength, boatWidth)} 
+				</span>}
+			{jobs.map((job) => (<div key={job.id} className="flex justify-between">
+				{ServiceType[job.id].priceType == "SQM" && (<div className={"flex flex-row justify-between w-full"}>
+					<span>{job.label} - {job.productPrice} SEK per {sqmFunc(boatLength, boatWidth)} kvm</span>
+					<span>{job.price} SEK</span>
+				</div>)}
+				{ServiceType[job.id].priceType == "unit" && (<div className={"flex flex-row justify-between w-full"}>
+					<span>{job.label} - {job.productPrice} SEK à {unitCounts[job.id]} enhet(er)</span>
+					<span>{job.price} SEK</span>
+				</div>)}
 			</div>))}
 		</div>
 
-		{/*TOTAL PRICE*/
-		}
+		{/*TOTAL PRICE*/}
 		<div className="mb-4">
 			<h1 className="text-2xl font-bold mb-2">TOTALT PRIS</h1>
-			<span>{(jobs.map(job => job.price).reduce((prev, curr) => curr + prev, 0)) +
-				(isIndoors ? ServiceType.WinterStay.prices.inside : ServiceType.WinterStay.prices.outdoor)
-			}
+			<span>{(jobs.map(job => job.price).reduce((prev, curr) => curr + prev, 0))}
 				kr</span>
 		</div>
 
-
-		{/*Email section	*/
-		}
+		{/*Email section	*/}
 		<form className={"flex flex-col space-y-4"} onSubmit={handleSubmitEmail}>
 			<div className="flex flex-col">
 				<label className="font-bold mb-2" htmlFor="name">Name:</label>
@@ -451,12 +452,16 @@ export const BoatForm = () => {
 					type="submit">Submit
 			</button>
 		</form>
-		{
-			isSubmitted && (<div className="text-green-500">Formuläret skickades framgångsrikt!</div>)
-		}
-		{
-			isSubmitted === false && (
-				<div className="text-red-500">Formulärsändningen misslyckades. Försök igen.</div>)
-		}
+		{isSubmitted && (<div className="text-green-500">Formuläret skickades framgångsrikt!</div>)}
+		{isSubmitted === false && (<div className="text-red-500">Formulärsändningen misslyckades. Försök igen.</div>)}
 	</div>)
+}
+
+export const priceTypeToT = (priceType) => {
+	if (priceType === "SQM") {
+		return "KVM";
+	}
+	if (priceType === "unit") {
+		return "enhet";
+	}
 }

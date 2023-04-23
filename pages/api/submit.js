@@ -1,3 +1,5 @@
+import {priceTypeToT} from "../../components/Form";
+
 export default async function handler(req, res) {
 	if (req.method === 'POST') {
 		console.log(req.body)
@@ -14,7 +16,6 @@ export default async function handler(req, res) {
 				jobsCopied
 			);
 			const encodedContent = encodeURIComponent(htmlContent);
-
 			const response = await fetch(`https://formspree.io/f/moqzyldy`, {
 				method: "POST",
 				headers: {
@@ -40,23 +41,27 @@ export default async function handler(req, res) {
 
 function formatEmail(company, customerName, customerEmail, boatModel, boatLength, boatWidth, jobs) {
 	let emailContent = `Hej ${company}, Vi har genererat följande kund från er hemsida.\n\n`
-	emailContent  += `Namn: ${customerName}\n`;
-	emailContent  += `Email: ${customerEmail}\n`;
-	emailContent  += `Båtmodell: ${boatModel}\n`;
-	emailContent  += `Längd: ${boatLength}\n`;
-	emailContent  += `Bredd: ${boatWidth}\n`;
-	emailContent  += `Kvadratmeter (Bredd + 0.5) x (Längd + 0.5): ${sqmFunc(boatLength,boatWidth)}	\n\n`;
+	emailContent += `Namn: ${customerName}\n`;
+	emailContent += `Email: ${customerEmail}\n`;
+	emailContent += `Båtmodell: ${boatModel}\n`;
+	emailContent += `Längd: ${boatLength}\n`;
+	emailContent += `Bredd: ${boatWidth}\n`;
+	emailContent += `Kvadratmeter (Bredd + 1) x (Längd) =  ${sqmFunc(boatLength, boatWidth)}	\n\n`;
 	let totalprice = 0;
 	jobs.forEach((job, index) => {
-		let line = `- ${job.label}: Pris: ${job.price} SEK`;
+		let label = job.label;
+		if (job.variantId) {
+			label = job.label;
+		}
+		let line = `${job.price} SEK - ${label} (${job.productPrice} SEK per ${priceTypeToT(job.priceType.toString())})`;
 		if (job.amount) {
-			line += ` | ${job.amount} Stycken`;
+			line += ` - ${job.amount} Stycken`;
 		}
 		emailContent += `${line}\n`;
 		totalprice += job.price;
 	});
 
-	emailContent  += `\nTotalt pris: ${totalprice}\n SEK`;
+	emailContent += `\n\n\n${totalprice} SEK TOTALT\n\n`;
 	emailContent += `\nVänligen följ upp med denna kund så snart som möjligt.
 
 	Tack för ert samarbete.
@@ -67,7 +72,7 @@ function formatEmail(company, customerName, customerEmail, boatModel, boatLength
 }
 
 const sqmFunc = (length, width) => {
-	return Math.round((clean(length) + 0.5) * (clean(width) + 0.5))
+	return Math.round((clean(length)) * (1 + clean(width)))
 }
 
 function clean(str) {
