@@ -10,7 +10,7 @@ export const ServiceType = {
 		}
 	},
 	EngineConservation: {
-		label: "Konservering av motorer",
+		label: "Konservering av motorer, exklusive glykol",
 		price: 1700,
 		priceType: "unit",
 	},
@@ -20,7 +20,7 @@ export const ServiceType = {
 		priceType: "unit",
 	},
 	Batteries: {
-		label: "Batterier",
+		label: "Batterivård",
 		price: 450,
 		priceType: "unit",
 	},
