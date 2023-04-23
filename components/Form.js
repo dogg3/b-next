@@ -396,7 +396,6 @@ export const BoatForm = () => {
 			</div>))}
 		</form>
 
-		OUTPUT PRICE AREA
 		<div className="mb-4">
 			<h1 className="text-2xl font-bold mb-2">PRIS</h1>
 			{boatWidth != 0 && boatLength != 0 &&
