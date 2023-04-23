@@ -8,24 +8,42 @@ export const ServiceType = {
 			outdoor: 500,
 			inside: 1100,
 		}
-
 	},
 	EngineConservation: {
 		label: "Konservering av motorer",
 		price: 1700,
 		priceType: "unit",
-	}, Batteries: {
-		label: "Batterier", price: 450, priceType: "unit",
-	}, FreshwaterSystemConservation: {
-		label: "Konservering färskvattensystem", price: 1300, priceType: "unit",
-	}, SepticTankConservation: {
-		label: "Konservering av septitank", price: 1300, priceType: "unit",
-	}, HaulOut: {
-		label: "Upptagning och sjösättning", price: 180, priceType: "SQM",
-	}, HullCleaning: {
-		label: "Bottentvätt", price: 60, priceType: "SQM",
-	}, ShrinkWrap: {
-		label: "Täckning med krymplast", price: 350, priceType: "SQM", filter: "outdoor",
+	},
+	Batteries: {
+		label: "Batterier",
+		price: 450,
+		priceType: "unit",
+	},
+	FreshwaterSystemConservation: {
+		label: "Konservering färskvattensystem",
+		price: 1300,
+		priceType: "unit",
+	},
+	SepticTankConservation: {
+		label: "Konservering av septitank",
+		price: 1300,
+		priceType: "unit",
+	},
+	HaulOut: {
+		label: "Upptagning och sjösättning",
+		price: 180,
+		priceType: "SQM",
+	},
+	HullCleaning: {
+		label: "Bottentvätt",
+		price: 60,
+		priceType: "SQM",
+	},
+	ShrinkWrap: {
+		label: "Täckning med krymplast",
+		price: 350,
+		priceType: "SQM",
+		filter: "outdoor",
 	},
 };
 
@@ -143,10 +161,37 @@ export const BoatForm = () => {
 	const [isSubmitted, setIsSubmitted] = useState(null);
 	const handleSubmitEmail = async (event) => {
 		event.preventDefault();
+		if (!boatModel) {
+			alert("Båtmodell är obligatoriskt att fylla i!")
+		}
+		if (!boatWidth) {
+			alert("Båtbredd obligatoriskt att fylla i!")
+		}
+		if (!boatLength) {
+			alert("Båtlängd är obligatoriskt att fylla i!")
+		}
+
+		const jobsCopied = jobs.slice();
+
+		jobsCopied.map(job => {
+			job.label = ServiceType[job.id].label;
+			if (ServiceType[job.id].priceType == "unit") {
+				job.amount = unitCounts[job.id]
+				return job;
+			}
+			return job;
+		})	
+		
+		// add winterystay to jobs
+		let WinterTypePrice = isIndoors ? ServiceType.WinterStay.prices.inside : ServiceType.WinterStay.prices.outside;
+		let WinterTypeLabel = isIndoors ? "Inomhus" : "Utomhus";
+		let winterType = {id: "WinterType", price: WinterTypePrice, label: WinterTypeLabel}
+		jobsCopied.push(winterType)
+
 		const response = await fetch('/api/submit', {
 			method: 'POST', headers: {
 				'Content-Type': 'application/json',
-			}, body: JSON.stringify({name, email, priceObject, totPrice}),
+			}, body: JSON.stringify({name, email, boatModel, boatLength, boatWidth, jobsCopied}),
 		});
 		const data = await response.json();
 		setIsSubmitted(response.ok);
