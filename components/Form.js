@@ -237,7 +237,7 @@ export const BoatForm = () => {
 	const sqmFunc = (length, width) => {
 		return Math.round((clean(boatLength) + 0.5) * (clean(boatWidth) + 0.5))
 	}
-	return (<div className="p-4 bg-amber-50">
+	return (<div className="p-4 bg-gray-100">
 		{/*Search boat form*/}
 		<div className="flex flex-col items-left">
 			<form onSubmit={handleSearch} className="flex items-center space-x-2">
@@ -390,8 +390,7 @@ export const BoatForm = () => {
 			{/*TYPE OF WINTERSTAY*/}
 
 			{boatWidth != 0 && boatLength != 0 &&
-				<span className="italic mb-[20px]">kvm = ({boatLength} meter längd + 0.5) * ({boatWidth} meter bredd + 0.5) =
-					{sqmFunc(boatLength, boatWidth)} 
+				<span className="italic mb-[20px]">kvm = ({boatLength} meter längd + 0.5) * ({boatWidth} meter bredd + 0.5) = {sqmFunc(boatLength, boatWidth)} 
 				</span>
 			}
 			<div className={"flex flex-row justify-between"}>
@@ -404,13 +403,13 @@ export const BoatForm = () => {
 			{jobs.map((field) => (<div key={field.id} className="flex justify-between">
 				{ServiceType[field.id].priceType == "SQM" && (
 					<div className={"flex flex-row justify-between w-full"}>
-						<span>{ServiceType[field.id].price} SEK per {sqmFunc(boatLength, boatWidth)} kvm</span>
+						<span>{ServiceType[field.id].label} - {ServiceType[field.id].price} SEK per {sqmFunc(boatLength, boatWidth)} kvm</span>
 						<span>{field.price} SEK</span>
 					</div>)
 				}
 				{ServiceType[field.id].priceType == "unit" && (
 					<div className={"flex flex-row justify-between w-full"}>
-						<span>{ServiceType[field.id].price} SEK à {unitCounts[field.id]} enhet(er)</span>
+						<span>{ServiceType[field.id].label} - {ServiceType[field.id].price} SEK à {unitCounts[field.id]} enhet(er)</span>
 						<span>{field.price} SEK</span>
 					</div>)
 				}
