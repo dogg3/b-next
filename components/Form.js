@@ -14,6 +14,11 @@ export const ServiceType = {
 		price: 1700,
 		priceType: "unit",
 	},
+	BatteryConservation: {
+		label: "Konservering av elverk",
+		price: 1700,
+		priceType: "unit",
+	},
 	Batteries: {
 		label: "Batterier",
 		price: 450,
@@ -30,7 +35,7 @@ export const ServiceType = {
 		priceType: "unit",
 	},
 	HaulOut: {
-		label: "Upptagning och sjösättning",
+		label: "Upptagning, sjösättning och avpallning",
 		price: 180,
 		priceType: "SQM",
 	},
@@ -138,7 +143,6 @@ export const BoatForm = () => {
 				job = {id: serviceTypeKey, price: unitprince};
 				break;
 		}
-
 		setJobs(prevItems => {
 			const index = prevItems.findIndex(item => item.id === job.id);
 			if (index === -1) {
@@ -241,9 +245,6 @@ export const BoatForm = () => {
 		{/*Search boat form*/}
 		<div className="flex flex-col items-left">
 			<form onSubmit={handleSearch} className="flex items-center space-x-2">
-				<label>
-					Sök efter båt:
-				</label>
 				<input
 					type="text"
 					id="searchTerm"
@@ -373,14 +374,6 @@ export const BoatForm = () => {
 							</select>
 						</div>)}
 					</label>
-					{
-						value.label === "vinterforvaring" ?
-							<div>
-								<span> | {value.price} SEK</span>
-								<span>{value.priceType.value.priceType == "SQM" ? "per kvadratmeter" : "per enhet"}</span>
-							</div>
-							: ""
-					}
 				</div>))}
 		</form>
 
