@@ -61,7 +61,7 @@ function formatEmail(company, customerName, customerEmail, boatModel, boatLength
 		totalprice += job.price;
 	});
 
-	emailContent += `\n\n\n${toCurrency(totalprice)} TOTALT\n\n`;
+	emailContent += `\n\n${toCurrency(totalprice)} TOTALT`;
 	emailContent += `\nVänligen följ upp med denna kund så snart som möjligt.
 
 	Tack för ert samarbete.
