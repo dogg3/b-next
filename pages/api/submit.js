@@ -1,4 +1,4 @@
-import {priceTypeToT} from "../../components/Form";
+import {priceTypeToT, toCurrency} from "../../components/Form";
 
 export default async function handler(req, res) {
 	if (req.method === 'POST') {
@@ -53,7 +53,7 @@ function formatEmail(company, customerName, customerEmail, boatModel, boatLength
 		if (job.variantId) {
 			label = job.label;
 		}
-		let line = `${job.price} SEK - ${label} (${job.productPrice} SEK per ${priceTypeToT(job.priceType.toString())})`;
+		let line = `${toCurrency(job.price)} - ${label} (${toCurrency(job.productPrice)} per ${toCurrency(priceTypeToT(job.priceType.toString()))})`;
 		if (job.amount) {
 			line += ` - ${job.amount} Stycken`;
 		}
@@ -61,7 +61,7 @@ function formatEmail(company, customerName, customerEmail, boatModel, boatLength
 		totalprice += job.price;
 	});
 
-	emailContent += `\n\n\n${totalprice} SEK TOTALT\n\n`;
+	emailContent += `\n\n\n${toCurrency(totalprice)} TOTALT\n\n`;
 	emailContent += `\nVänligen följ upp med denna kund så snart som möjligt.
 
 	Tack för ert samarbete.

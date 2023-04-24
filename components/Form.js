@@ -399,26 +399,34 @@ export const BoatForm = () => {
 		<div className="mb-4">
 			<h1 className="text-2xl font-bold mb-2">PRIS</h1>
 			{boatWidth != 0 && boatLength != 0 &&
-				<span
-					className="italic mb-[20px]">kvm = ({boatLength} meter) * ({boatWidth} meter bredd + 1) = {sqmFunc(boatLength, boatWidth)} 
-				</span>}
+				<div
+					className="italic mb-4 text-sm">kvm = ({boatLength} meter) * ({boatWidth} meter bredd + 1) = {sqmFunc(boatLength, boatWidth)} 
+				</div>}
 			{jobs.map((job) => (<div key={job.id} className="flex justify-between">
-				{ServiceType[job.id].priceType == "SQM" && (<div className={"flex flex-row justify-between w-full"}>
-					<span>{job.label} - {job.productPrice} SEK per {sqmFunc(boatLength, boatWidth)} kvm</span>
-					<span>{job.price} SEK</span>
-				</div>)}
-				{ServiceType[job.id].priceType == "unit" && (<div className={"flex flex-row justify-between w-full"}>
-					<span>{job.label} - {job.productPrice} SEK à {unitCounts[job.id]} enhet(er)</span>
-					<span>{job.price} SEK</span>
-				</div>)}
+				{ServiceType[job.id].priceType == "SQM" && (
+					<div className={"flex flex-row justify-between w-full mb-4"}>
+						<div className={"flex flex-col"}>
+							<span>{job.label} </span>
+							<span>{toCurrency(job.productPrice)} per {sqmFunc(boatLength, boatWidth)} kvm</span>
+						</div>
+						<span>{toCurrency(job.price)}</span>
+					</div>)}
+				{ServiceType[job.id].priceType == "unit" && (
+					<div className={"flex flex-row justify-between w-full mb-4"}>
+						<div className={"flex flex-col"}>
+							<span>{job.label} </span>
+							<span>{toCurrency(job.productPrice)} per {unitCounts[job.id]} enhet(er)</span>
+						</div>
+						<span>{toCurrency(job.price)}</span>
+					</div>)}
 			</div>))}
 		</div>
 
 		{/*TOTAL PRICE*/}
 		<div className="mb-4">
 			<h1 className="text-2xl font-bold mb-2">TOTALT PRIS</h1>
-			<span>{(jobs.map(job => job.price).reduce((prev, curr) => curr + prev, 0))}
-				kr</span>
+			<span>{toCurrency((jobs.map(job => job.price).reduce((prev, curr) => curr + prev, 0)))}
+				</span>
 		</div>
 
 		{/*Email section	*/}
@@ -463,4 +471,9 @@ export const priceTypeToT = (priceType) => {
 	if (priceType === "unit") {
 		return "enhet";
 	}
+}
+
+export const toCurrency = (price) => {
+	const formattedAmount = price.toLocaleString('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 0 });
+	return formattedAmount
 }
