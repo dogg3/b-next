@@ -244,27 +244,37 @@ export const BoatForm = () => {
 
 	const [boatModel, setboatModel] = useState('');
 	const [boatId, setBoatId] = useState('');
-	const handleItemClick = (item) => {
+	const handleItemClick = async (item) => {
 		const {itemId, brandName, modelName} = item;
 		setboatModel(`${brandName} ${modelName}`);
 		setBoatId(itemId);
 		setSearchResults([])
-		updateDimensions(itemId)
+		await updateDimensions(itemId)
 	};
 
 	const updateDimensions = async (boatId) => {
 		try {
-			const response = await fetch(`https://items.sokbat.se/api/item/v1/${boatId}`);
+			console.log("herd ekwjdbfnaksnd")
+			const response = await fetch(`https://cors-anywhere.herokuapp.com/https://items.sokbat.se/api/item/v1/${boatId}`, {
+				headers: { 'Authorization': 'TestToken',  'Origin': 'http://localhost:3000'}
+			});
 			const data = await response.json();
-			setBoatLength(data.Length);
-			setBoatWidth(data.Width);
+			
+			if (data) {
+				if (data.Width) {
+					setBoatWidth(String(data.Width/100));
+				}
+				if (data.Length) {
+					setBoatLength(String(data.Length/100));
+				}
+			}
 		} catch (error) {
 			console.log(error);
 		}
 	}
 
 
-	const sqmFunc = (length, width) => {
+	const sqmFunc = () => {
 		return Math.round((clean(boatLength)) * (1 + clean(boatWidth)))
 	}
 	return (<div className="p-4 bg-gray-100">
@@ -400,7 +410,8 @@ export const BoatForm = () => {
 			<h1 className="text-2xl font-bold mb-2">PRIS</h1>
 			{boatWidth != 0 && boatLength != 0 &&
 				<div
-					className="italic mb-4 text-sm">kvm = ({boatLength} meter) * ({boatWidth} meter bredd + 1) = {sqmFunc(boatLength, boatWidth)} 
+					className="italic mb-4 text-sm">kvm = ({boatLength} meter) * ({boatWidth} meter bredd + 1)
+					= {sqmFunc(boatLength, boatWidth)}
 				</div>}
 			{jobs.map((job) => (<div key={job.id} className="flex justify-between">
 				{ServiceType[job.id].priceType == "SQM" && (
@@ -474,6 +485,10 @@ export const priceTypeToT = (priceType) => {
 }
 
 export const toCurrency = (price) => {
-	const formattedAmount = price.toLocaleString('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 0 });
+	const formattedAmount = price.toLocaleString('sv-SE', {
+		style: 'currency',
+		currency: 'SEK',
+		maximumFractionDigits: 0
+	});
 	return formattedAmount
 }
