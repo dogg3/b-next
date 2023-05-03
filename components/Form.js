@@ -255,7 +255,7 @@ export const BoatForm = () => {
 	const updateDimensions = async (boatId) => {
 		try {
 			console.log("herd ekwjdbfnaksnd")
-			const response = await fetch(`https://cors-anywhere.herokuapp.com/https://items.sokbat.se/api/item/v1/${boatId}`, {
+			const response = await fetch(`https://items.sokbat.se/api/item/v1/${boatId}`, {
 				headers: { 'Authorization': 'TestToken',  'Origin': 'http://localhost:3000'}
 			});
 			const data = await response.json();
