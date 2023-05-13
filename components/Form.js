@@ -54,10 +54,6 @@ export const ServiceType = {
 };
 
 
-const sqmPriceFun = (sqm, price) => {
-	return parseInt(sqm * price);
-}
-
 export const BoatForm = () => {
 	const [boatLength, setBoatLength] = useState(0);
 	const [boatWidth, setBoatWidth] = useState(0);
@@ -144,7 +140,7 @@ export const BoatForm = () => {
 					return false;
 				}
 				let sqm = sqmFunc(boatLength * boatWidth);
-				let pr = sqmPriceFun(sqm, serviceType.price);
+				let pr = sqmFunc(sqm, serviceType.price);
 				job = {
 					id: serviceTypeKey,
 					price: pr,
@@ -275,7 +271,7 @@ export const BoatForm = () => {
 
 
 	const sqmFunc = () => {
-		return Math.round((clean(boatLength)) * (1 + clean(boatWidth)))
+		return Math.round((clean(boatLength)) * (0.5 + clean(boatWidth)))
 	}
 	return (<div className="p-4 bg-gray-100">
 		{/*Search boat form*/}
@@ -410,7 +406,7 @@ export const BoatForm = () => {
 			<h1 className="text-2xl font-bold mb-2">PRIS</h1>
 			{boatWidth != 0 && boatLength != 0 &&
 				<div
-					className="italic mb-4 text-sm">kvm = ({boatLength} meter) * ({boatWidth} meter bredd + 1)
+					className="italic mb-4 text-sm">kvm = ({boatLength} meter) * ({boatWidth} meter bredd + 0.5)
 					= {sqmFunc(boatLength, boatWidth)}
 				</div>}
 			{jobs.map((job) => (<div key={job.id} className="flex justify-between">
