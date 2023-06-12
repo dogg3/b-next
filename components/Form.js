@@ -271,7 +271,7 @@ export const BoatForm = () => {
 
 
 	const sqmFunc = () => {
-		return Math.round((clean(boatLength)) * (0.5 + clean(boatWidth)))
+		return Math.round((clean(boatLength)) * (0.5 + clean(boatWidth))) 
 	}
 	return (<div className="p-4 bg-gray-100">
 		{/*Search boat form*/}
@@ -416,7 +416,7 @@ export const BoatForm = () => {
 							<span>{job.label} </span>
 							<span>{toCurrency(job.productPrice)} per {sqmFunc(boatLength, boatWidth)} kvm</span>
 						</div>
-						<span>{toCurrency(job.price)}</span>
+						<span>{toCurrency(sqmFunc(boatLength, boatWidth) * job.productPrice)}</span>
 					</div>)}
 				{ServiceType[job.id].priceType == "unit" && (
 					<div className={"flex flex-row justify-between w-full mb-4"}>
@@ -431,7 +431,7 @@ export const BoatForm = () => {
 
 		{/*TOTAL PRICE*/}
 		<div className="mb-4">
-			<h1 className="text-2xl font-bold mb-2">TOTALT PRIS</h1>
+			<h1 className="text-2xl font-bold mb-2">TOTALT PRIS ink moms</h1>
 			<span>{toCurrency((jobs.map(job => job.price).reduce((prev, curr) => curr + prev, 0)))}
 				</span>
 		</div>
