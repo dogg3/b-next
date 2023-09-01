@@ -24,7 +24,6 @@ export default async function handler(req, res) {
 				body: `kund=${name}&modell=${boatModel}&meddelande=${encodedContent}`,
 			});
 			const data = await response.text();
-			console.log(data);
 			if (data?.error) {
 				res.status(500).json({message: 'internal', data: data});
 			}
