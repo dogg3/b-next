@@ -256,14 +256,6 @@ export const BoatForm = ({sType}) => {
 				ServiceType={ServiceType}
 				unitCounts={unitCounts}
 			/>
-
-			{/*TOTAL PRICE*/}
-			<div className="mb-4">
-				<h1 className="text-2xl font-bold mb-2">TOTALT PRIS ink moms</h1>
-				<span>{toCurrency((jobs.map(job => job.price).reduce((prev, curr) => curr + prev, 0)))}
-				</span>
-			</div>
-
 			{/*Email section	*/}
 			<form className={"flex flex-col space-y-4"} onSubmit={handleSubmitEmail}>
 				<div className="flex flex-col">
