@@ -1,4 +1,10 @@
 import React from "react";
+import {
+	BOAT_LENGTH_LABEL,
+	BOAT_TYPE_LABEL, BOAT_WIDTH_LABEL,
+	PRICE_TYPE_SQM,
+	PRICE_TYPE_UNIT
+} from "./utils";
 
 function BoatFormSection({
 							 boatModel,
@@ -32,7 +38,7 @@ function BoatFormSection({
 	);
 
 	const renderServiceVariants = (key, value) => {
-		if (value.priceType === "SQM" && value.variants) {
+		if (value.priceType === PRICE_TYPE_SQM && value.variants) {
 			return (
 				<div key={key} className="flex flex-col">
 					{value.label}
@@ -57,7 +63,9 @@ function BoatFormSection({
 					))}
 				</div>
 			);
-		} else if (value.priceType === "SQM") {
+		}
+
+		if (value.priceType === PRICE_TYPE_SQM) {
 			return (
 				<label key={key}>
 					<input
@@ -71,7 +79,9 @@ function BoatFormSection({
 					{value.label}
 				</label>
 			);
-		} else if (value.priceType === "unit") {
+		}
+
+		if (value.priceType === PRICE_TYPE_UNIT) {
 			return (
 				<label className="flex flex-row" key={key}>
 					<select
@@ -90,26 +100,22 @@ function BoatFormSection({
 				</label>
 			);
 		}
+
 		return null;
 	};
 
 	return (
 		<form className="flex flex-col space-y-4 mb-4">
+			{renderInputField(BOAT_TYPE_LABEL, "boat-length", boatModel, setBoatModel)}
 			{renderInputField(
-				"Båttyp:",
-				"boat-length",
-				boatModel,
-				setBoatModel
-			)}
-			{renderInputField(
-				"Båtlängd (meter):",
+				BOAT_LENGTH_LABEL,
 				"boat-length",
 				boatLength,
 				setBoatLength,
 				"number"
 			)}
 			{renderInputField(
-				"Båtbredd (meter):",
+				BOAT_WIDTH_LABEL,
 				"boat-width",
 				boatWidth,
 				setBoatWidth,

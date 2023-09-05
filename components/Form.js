@@ -1,15 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import BoatFormSection from "./BoatFormSection";
 import SearchBoatForm from "./SearchBoatForm";
 import PricingSection from "./PricingSection";
 import EmailSection from "./EmailSection";
+import {sqmFunc} from "./utils";
 
 
 export const BoatForm = ({sType}) => {
 	const [boatLength, setBoatLength] = useState(0);
 	const [boatWidth, setBoatWidth] = useState(0);
-	const [companyJobs, setCompanyJobs] = useState();
-	const [ServiceType, setServiceType] = useState(sType);
+	const [ServiceType, _] = useState(sType);
 
 	//PriceObjects 
 	const [priceObject, setPriceObject] = useState([])
@@ -20,8 +20,8 @@ export const BoatForm = ({sType}) => {
 	const handleUnitCount = async (event) => {
 		const key = event.target.name;
 		const count = event.target.value;
-		if (count == 0) {
-			await setJobs((prev) => prev.filter((v) => v.id != key));
+		if (count === 0) {
+			await setJobs((prev) => prev.filter((v) => v.id !== key));
 		}
 		setUnitCounts(prevUnitCounts => {
 			const newUnitCounts = {
@@ -33,7 +33,6 @@ export const BoatForm = ({sType}) => {
 	}
 
 	// jobs 
-	const [variants, setVariants] = useState([])
 	const handleVariant = async (event) => {
 		if (boatLength === 0 || boatWidth === 0) {
 			alert("Du måste skriva in båtlängd och båtbredd om den inte populeras.");
@@ -89,8 +88,7 @@ export const BoatForm = ({sType}) => {
 					alert("Du måste skriva in båtlängd och båtbredd om den inte populeras.");
 					return false;
 				}
-				let sqm = sqmFunc(boatLength * boatWidth);
-				let pr = sqmFunc(sqm, serviceType.price);
+				let sqm = sqmFunc(boatLength, boatWidth);
 				job = {
 					id: serviceTypeKey,
 					price: serviceType.price * sqm,
@@ -157,7 +155,7 @@ export const BoatForm = ({sType}) => {
 		const jobsCopied = jobs.slice();
 
 		jobsCopied.map(job => {
-			if (ServiceType[job.id].priceType == "unit") {
+			if (ServiceType[job.id].priceType === "unit") {
 				job.amount = unitCounts[job.id]
 				return job;
 			}
@@ -169,7 +167,6 @@ export const BoatForm = ({sType}) => {
 				'Content-Type': 'application/json',
 			}, body: JSON.stringify({name, email, boatModel, boatLength, boatWidth, jobsCopied}),
 		});
-		const data = await response.json();
 		setIsSubmitted(response.ok);
 	};
 
@@ -189,11 +186,9 @@ export const BoatForm = ({sType}) => {
 	};
 
 	const [boatModel, setBoatModel] = useState('');
-	const [boatId, setBoatId] = useState('');
 	const handleItemClick = async (item) => {
 		const {itemId, brandName, modelName} = item;
 		setBoatModel(`${brandName} ${modelName}`);
-		setBoatId(itemId);
 		setSearchResults([])
 		await updateDimensions(itemId)
 	};
@@ -214,14 +209,6 @@ export const BoatForm = ({sType}) => {
 		} catch (error) {
 			console.log(error);
 		}
-	}
-
-	function clean(str) {
-		return parseFloat(str.replace(",", "."));
-	}
-
-	const sqmFunc = () => {
-		return Math.round((clean(boatLength)) * (0.5 + clean(boatWidth)))
 	}
 	return (
 		<div className="p-4 bg-gray-100">
@@ -267,18 +254,3 @@ export const BoatForm = ({sType}) => {
 		</div>)
 }
 
-export const priceTypeToT = (priceType) => {
-	if (priceType === "SQM") {
-		return "KVM";
-	}
-	if (priceType === "unit") {
-		return "enhet";
-	}
-}
-
-export const toCurrency = (price) => {
-	const formattedAmount = price.toLocaleString('sv-SE', {
-		style: 'currency', currency: 'SEK', maximumFractionDigits: 0
-	});
-	return formattedAmount
-}
