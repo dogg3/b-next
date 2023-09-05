@@ -64,14 +64,13 @@ function generateEmailContent(
 	boatWidth: number,
 	jobs: Job[]
 ): string {
-	
 	const company = 'Ramsövarvet';
 	const emailHeader = `Hej ${company}, Vi har genererat följande kund från er hemsida.\n\n`;
 	const customerInfo = `Namn: ${customerName}\nEmail: ${customerEmail}\nBåtmodell: ${boatModel}\nLängd: ${boatLength}\nBredd: ${boatWidth}\nKvadratmeter (Bredd + 1) x (Längd) = ${sqmFunc(
 		boatLength,
 		boatWidth
 	)}\n\n`;
-
+	
 	const jobLines = jobs.map((job) => {
 		let label = job.label;
 		if (job.variantId) {
