@@ -4,7 +4,7 @@ import SearchBoatForm from "./SearchBoatForm";
 import PricingSection from "./PricingSection";
 import EmailSection from "./EmailSection";
 import {sqmFunc} from "./utils";
-import {handleSearchAPI, updateDimensionsAPI} from "./api";
+import {handleSearchAPI, submitEmailAPI, updateDimensionsAPI} from "./api";
 
 
 export const BoatForm = ({sType}) => {
@@ -121,54 +121,58 @@ export const BoatForm = ({sType}) => {
 	}
 
 	const updateOrCreateJob = (job) => {
-		setJobs(prevItems => {
-			const index = prevItems.findIndex(item => item.id === job.id);
+		setJobs((prevItems) => {
+			const index = prevItems.findIndex((item) => item.id === job.id);
 			if (index === -1) {
 				// If no job with the same id exists, add the new job with the id property
 				return [...prevItems, job];
-			} else {
-				// If a job with the same id exists, overwrite it with the new job object
-				const updatedItems = [...prevItems];
-				updatedItems[index] = job;
-				return updatedItems;
 			}
-		})
-	}
-
+			// If a job with the same id exists, overwrite it with the new job object
+			const updatedItems = [...prevItems];
+			updatedItems[index] = job;
+			return updatedItems;
+		});
+	};	
+	
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [isSubmitted, setIsSubmitted] = useState(null);
+	
 	const handleSubmitEmail = async (event) => {
 		event.preventDefault();
 		if (!boatModel) {
-			alert("Båtmodell är obligatoriskt att fylla i!")
-			return
+			alert("Båtmodell är obligatoriskt att fylla i!");
+			return;
 		}
 		if (!boatWidth) {
-			alert("Båtbredd obligatoriskt att fylla i!")
-			return
+			alert("Båtbredd obligatoriskt att fylla i!");
+			return;
 		}
 		if (!boatLength) {
-			alert("Båtlängd är obligatoriskt att fylla i!")
-			return
+			alert("Båtlängd är obligatoriskt att fylla i!");
+			return;
 		}
 
 		const jobsCopied = jobs.slice();
 
-		jobsCopied.map(job => {
+		jobsCopied.map((job) => {
 			if (ServiceType[job.id].priceType === "unit") {
-				job.amount = unitCounts[job.id]
+				job.amount = unitCounts[job.id];
 				return job;
 			}
 			return job;
-		})
-
-		const response = await fetch('/api/submit', {
-			method: 'POST', headers: {
-				'Content-Type': 'application/json',
-			}, body: JSON.stringify({name, email, boatModel, boatLength, boatWidth, jobsCopied}),
 		});
-		setIsSubmitted(response.ok);
+
+		const emailData = {
+			name,
+			email,
+			boatModel,
+			boatLength,
+			boatWidth,
+			jobs: jobsCopied,
+		};
+		const isSubmitted = await submitEmailAPI(emailData);
+		setIsSubmitted(isSubmitted);
 	};
 
 	const [searchTerm, setSearchTerm] = useState("");

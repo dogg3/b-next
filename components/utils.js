@@ -5,10 +5,10 @@ export const PRICE_TYPE_SQM = "SQM";
 export const PRICE_TYPE_UNIT = "unit";
 
 export const priceTypeToT = (priceType) => {
-	if (priceType === "SQM") {
+	if (priceType === PRICE_TYPE_SQM) {
 		return "KVM";
 	}
-	if (priceType === "unit") {
+	if (priceType === PRICE_TYPE_UNIT) {
 		return "enhet";
 	}
 };

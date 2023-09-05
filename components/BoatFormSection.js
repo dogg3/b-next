@@ -106,7 +106,11 @@ function BoatFormSection({
 
 	return (
 		<form className="flex flex-col space-y-4 mb-4">
-			{renderInputField(BOAT_TYPE_LABEL, "boat-length", boatModel, setBoatModel)}
+			{renderInputField(
+				BOAT_TYPE_LABEL,
+				"boat-length",
+				boatModel,
+				setBoatModel)}
 			{renderInputField(
 				BOAT_LENGTH_LABEL,
 				"boat-length",
