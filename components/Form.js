@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import BoatFormSection from "./BoatFormSection";
 import SearchBoatForm from "./SearchBoatForm";
+import PricingSection from "./PricingSection";
 
 
 export const BoatForm = ({sType}) => {
@@ -246,33 +247,15 @@ export const BoatForm = ({sType}) => {
 				unitCounts={unitCounts}
 				handleUnitCount={handleUnitCount}
 				priceObject={priceObject}
-			/>	
+			/>
 
-			<div className="mb-4">
-				<h1 className="text-2xl font-bold mb-2">PRIS</h1>
-				{boatWidth != 0 && boatLength != 0 && <div
-					className="italic mb-4 text-sm">kvm = ({boatLength} meter) * ({boatWidth} meter bredd + 0.5)
-					= {sqmFunc(boatLength, boatWidth)}
-				</div>}
-				{jobs.map((job) => (<div key={job.id} className="flex justify-between">
-					{ServiceType[job.id].priceType == "SQM" && (
-						<div className={"flex flex-row justify-between w-full mb-4"}>
-							<div className={"flex flex-col"}>
-								<span>{job.label} </span>
-								<span>{toCurrency(job.productPrice)} per {sqmFunc(boatLength, boatWidth)} kvm</span>
-							</div>
-							<span>{toCurrency(sqmFunc(boatLength, boatWidth) * job.productPrice)}</span>
-						</div>)}
-					{ServiceType[job.id].priceType == "unit" && (
-						<div className={"flex flex-row justify-between w-full mb-4"}>
-							<div className={"flex flex-col"}>
-								<span>{job.label} </span>
-								<span>{toCurrency(job.productPrice)} per {unitCounts[job.id]} enhet(er)</span>
-							</div>
-							<span>{toCurrency(job.price)}</span>
-						</div>)}
-				</div>))}
-			</div>
+			<PricingSection
+				boatWidth={boatWidth}
+				boatLength={boatLength}
+				jobs={jobs}
+				ServiceType={ServiceType}
+				unitCounts={unitCounts}
+			/>
 
 			{/*TOTAL PRICE*/}
 			<div className="mb-4">
