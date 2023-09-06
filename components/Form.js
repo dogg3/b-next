@@ -1,16 +1,29 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import BoatFormSection from "./BoatFormSection";
 import SearchBoatForm from "./SearchBoatForm";
 import PricingSection from "./PricingSection";
 import EmailSection from "./EmailSection";
 import {sqmFunc} from "./utils";
-import {handleSearchAPI, submitEmailAPI, updateDimensionsAPI} from "./api";
+import {getServiceTypesAPI, handleSearchAPI, submitEmailAPI, updateDimensionsAPI} from "./api";
 
-
-export const BoatForm = ({sType}) => {
+export const BoatForm = () => {
 	const [boatLength, setBoatLength] = useState(0);
 	const [boatWidth, setBoatWidth] = useState(0);
-	const [ServiceType, _] = useState(sType);
+	const [ServiceType, setServiceType] = useState();
+
+
+	useEffect(() => {
+		async function fetchData() {
+			try {
+				const serviceTypes = await getServiceTypesAPI();
+				console.log("serviceTypes", serviceTypes)
+				setServiceType(serviceTypes);
+			} catch (error) {
+				console.log(error);
+			}
+		}
+		fetchData();
+	}, [])
 
 	//PriceObjects 
 	const [priceObject, setPriceObject] = useState([])
@@ -132,12 +145,12 @@ export const BoatForm = ({sType}) => {
 			updatedItems[index] = job;
 			return updatedItems;
 		});
-	};	
-	
+	};
+
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [isSubmitted, setIsSubmitted] = useState(null);
-	
+
 	const handleSubmitEmail = async (event) => {
 		event.preventDefault();
 		if (!boatModel) {
@@ -192,46 +205,48 @@ export const BoatForm = ({sType}) => {
 		setSearchResults([])
 		await updateDimensionsAPI(itemId, setBoatWidth, setBoatLength); // Use the updateDimensionsAPI function
 	};
-	return (<div className="p-4 bg-gray-100">
-		<SearchBoatForm
-			searchTerm={searchTerm}
-			handleSearch={handleSearch}
-			setSearchTerm={setSearchTerm}
-			searchResults={searchResults}
-			handleItemClick={handleItemClick}
-		/>
-		<div className={"h-[20px]"}/>
-		{/*service jobs*/}
-		<BoatFormSection
-			boatModel={boatModel}
-			setBoatModel={setBoatModel}
-			boatLength={boatLength}
-			setBoatLength={setBoatLength}
-			boatWidth={boatWidth}
-			setBoatWidth={setBoatWidth}
-			ServiceType={ServiceType}
-			jobs={jobs}
-			handleVariant={handleVariant}
-			handlePriceObject={handlePriceObject}
-			unitCounts={unitCounts}
-			handleUnitCount={handleUnitCount}
-			priceObject={priceObject}
-		/>
-		<PricingSection
-			boatWidth={boatWidth}
-			boatLength={boatLength}
-			jobs={jobs}
-			ServiceType={ServiceType}
-			unitCounts={unitCounts}
-		/>
-		<EmailSection
-			name={name}
-			email={email}
-			isSubmitted={isSubmitted}
-			setName={setName}
-			setEmail={setEmail}
-			handleSubmitEmail={handleSubmitEmail}
-		/>
-	</div>)
+	return (
+		<div className="p-4 bg-gray-100">
+			<SearchBoatForm
+				searchTerm={searchTerm}
+				handleSearch={handleSearch}
+				setSearchTerm={setSearchTerm}
+				searchResults={searchResults}
+				handleItemClick={handleItemClick}
+			/>
+			<div className={"h-[20px]"}/>
+			{/*service jobs*/}
+			<BoatFormSection
+				boatModel={boatModel}
+				setBoatModel={setBoatModel}
+				boatLength={boatLength}
+				setBoatLength={setBoatLength}
+				boatWidth={boatWidth}
+				setBoatWidth={setBoatWidth}
+				ServiceType={ServiceType}
+				jobs={jobs}
+				handleVariant={handleVariant}
+				handlePriceObject={handlePriceObject}
+				unitCounts={unitCounts}
+				handleUnitCount={handleUnitCount}
+				priceObject={priceObject}
+			/>
+			<PricingSection
+				boatWidth={boatWidth}
+				boatLength={boatLength}
+				jobs={jobs}
+				ServiceType={ServiceType}
+				unitCounts={unitCounts}
+			/>
+			<EmailSection
+				name={name}
+				email={email}
+				isSubmitted={isSubmitted}
+				setName={setName}
+				setEmail={setEmail}
+				handleSubmitEmail={handleSubmitEmail}
+			/>
+		</div>
+	)
 }
 

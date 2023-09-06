@@ -125,13 +125,15 @@ function BoatFormSection({
 				setBoatWidth,
 				"number"
 			)}
-			{Object.entries(ServiceType).map(([key, value]) => (
-				<div key={key} className="flex items-center space-x-2">
-					<label className="flex items-center">
-						{renderServiceVariants(key, value)}
-					</label>
-				</div>
-			))}
+			{ServiceType &&
+				Object.entries(ServiceType).map(([key, value]) => (
+					<div key={key} className="flex items-center space-x-2">
+						<label className="flex items-center">
+							{renderServiceVariants(key, value)}
+						</label>
+					</div>
+				))
+			}
 		</form>
 	);
 }

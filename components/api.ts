@@ -35,7 +35,7 @@ export interface EmailData {
 	boatModel: string;
 	boatLength: string;
 	boatWidth: string;
-	jobs: any[]; // You should define the type of 'jobs' more specifically
+	jobs: any[]
 }
 
 export async function submitEmailAPI(data: {
@@ -58,5 +58,15 @@ export async function submitEmailAPI(data: {
 	} catch (error) {
 		console.error(error);
 		return false;
+	}
+}
+
+export async function getServiceTypesAPI(): Promise<any> {
+	try {
+		const response = await fetch('/api/serviceTypes/1');
+		return await response.json();
+	} catch (error) {
+		console.error(error);
+		return [];
 	}
 }
