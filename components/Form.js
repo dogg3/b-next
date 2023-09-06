@@ -11,7 +11,6 @@ export const BoatForm = () => {
 	const [boatWidth, setBoatWidth] = useState(0);
 	const [ServiceType, setServiceType] = useState();
 
-
 	useEffect(() => {
 		async function fetchData() {
 			try {

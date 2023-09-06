@@ -1,4 +1,5 @@
 import {Dispatch, SetStateAction} from "react";
+import {FormServiceTypeData} from "@/types/serviceType";
 
 export async function handleSearchAPI(searchTerm: string, setSearchResults: Dispatch<any>) {
 	try {
@@ -63,10 +64,32 @@ export async function submitEmailAPI(data: {
 
 export async function getServiceTypesAPI(): Promise<any> {
 	try {
-		const response = await fetch('/api/serviceTypes/1');
+		const response = await fetch('/api/serviceTypes/all');
 		return await response.json();
 	} catch (error) {
 		console.error(error);
 		return [];
 	}
 }
+
+export async function createServiceType(serviceTypeData: FormServiceTypeData) {
+	try {
+		const response = await fetch('/api/serviceTypes/1', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(serviceTypeData),
+		});
+
+		if (response.ok) {
+			return true; // Success
+		} else {
+			throw new Error('Failed to create service type.');
+		}
+	} catch (error) {
+		// @ts-ignore
+		throw new Error(`Error creating service type: ${error.message}`);
+	}
+}
+

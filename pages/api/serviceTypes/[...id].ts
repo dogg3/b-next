@@ -1,22 +1,8 @@
 import {NextApiRequest, NextApiResponse} from 'next';
+import {ServiceTypeData} from "@/types/serviceType";
 
-export interface ServiceTypeData {
-	[key: string]: {
-		label: string;
-		priceType: string;
-		variants?: {
-			[variant: string]: {
-				price: number;
-				label: string;
-				priceType: string;
-			};
-		};
-		price?: number;
-		filter?: string;
-	};
-}
 
-const serviceType: ServiceTypeData = {
+let serviceType: ServiceTypeData = {
 	WinterStay: {
 		label: 'Placeringar',
 		priceType: 'SQM',
@@ -67,49 +53,45 @@ const serviceType: ServiceTypeData = {
 	},
 };
 
+function generateKey() {
+	// Generate a unique key (you can use any method you prefer)
+	return Math.random().toString(36).substring(2, 15);
+}
+
 export default (req: NextApiRequest, res: NextApiResponse) => {
-	const {method} = req;
-	// @ts-ignore
-	const [, id] = req.query.id;
+	const { method } = req;
 
 	switch (method) {
 		case 'GET':
-			if (id) {
-				// Retrieve a specific service type by ID
-				const type = serviceType[id];
-				if (type) {
-					res.status(200).json(type);
-				} else {
-					res.status(404).json({error: 'Service type not found'});
-				}
-			}
-			// Retrieve all service types
 			res.status(200).json(serviceType);
 			break;
-		case 'PUT':
-			if (id) {
-				// Update a service type by ID
-				if (serviceType[id]) {
-					const {label, price, priceType, variants} = req.body;
-					serviceType[id] = {label, price, priceType, variants};
-					res.status(200).json(serviceType[id]);
-				} else {
-					res.status(404).json({error: 'Service type not found'});
+		case 'POST':
+			// Handle the POST request to add a new service type
+			try {
+				const newServiceTypeData = req.body;
+				const { label, price, priceType, variants } = newServiceTypeData;
+
+				// Validate the new data and perform any necessary checks here
+				if (!label || !price || !priceType) {
+					res.status(400).json({ error: 'Invalid data format' });
+					return;
 				}
-			}
-			break;
-		case 'DELETE':
-			if (id) {
-				// Delete a service type by ID
-				if (serviceType[id]) {
-					delete serviceType[id];
-					res.status(204).end();
-				} else {
-					res.status(404).json({error: 'Service type not found'});
-				}
+
+				// Generate a new key for the service type
+				const key = generateKey();
+
+				// Update the serviceType object with the new data and generated key
+				serviceType = {
+					...serviceType,
+					[key]: { label, price, priceType, variants },
+				};
+
+				res.status(200).json(serviceType); // Respond with the updated serviceType data
+			} catch (error) {
+				res.status(400).json({ error: 'Invalid data format' });
 			}
 			break;
 		default:
-			res.status(405).json({error: 'Method not allowed'});
+			res.status(405).json({ error: 'Method not allowed' });
 	}
 };
