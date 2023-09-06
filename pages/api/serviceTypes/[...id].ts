@@ -1,97 +1,78 @@
 import {NextApiRequest, NextApiResponse} from 'next';
-import {ServiceTypeData} from "@/types/serviceType";
+import {db} from '@/firebase';
+import {getDocs, doc, setDoc, collection} from 'firebase/firestore';
+import {ServiceType} from "@/types/serviceType";
 
-
-let serviceType: ServiceTypeData = {
-	WinterStay: {
-		label: 'Placeringar',
-		priceType: 'SQM',
-		variants: {
-			outdoor: {price: 500, label: 'Utomhus', priceType: 'SQM'},
-			inside: {price: 1100, label: 'Inomhus', priceType: 'SQM'},
-		},
-	},
-	EngineConservation: {
-		label: 'Konservering av motorer, exklusive glykol',
-		price: 1700,
-		priceType: 'unit',
-	},
-	BatteryConservation: {
-		label: 'Konservering av elverk',
-		price: 1700,
-		priceType: 'unit',
-	},
-	Batteries: {
-		label: 'Batterivård',
-		price: 450,
-		priceType: 'unit',
-	},
-	FreshwaterSystemConservation: {
-		label: 'Konservering färskvattensystem',
-		price: 1300,
-		priceType: 'unit',
-	},
-	SepticTankConservation: {
-		label: 'Konservering av septitank',
-		price: 1300,
-		priceType: 'unit',
-	},
-	HaulOut: {
-		label: 'Upptagning, sjösättning och avpallning',
-		price: 180,
-		priceType: 'SQM',
-	},
-	HullCleaning: {
-		label: 'Bottentvätt',
-		price: 60,
-		priceType: 'SQM',
-	},
-	ShrinkWrap: {
-		label: 'Täckning med krymplast',
-		price: 350,
-		priceType: 'SQM',
-	},
-};
-
-function generateKey() {
-	// Generate a unique key (you can use any method you prefer)
-	return Math.random().toString(36).substring(2, 15);
+function sanitizeLabel(label: string) {
+	// Remove any non-English letters and trim the label
+	return label.replace(/[^a-zA-Z]/g, '').trim();
 }
 
-export default (req: NextApiRequest, res: NextApiResponse) => {
-	const { method } = req;
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+	const {method} = req;
+	const serviceTypesCollection = collection(db, 'serviceTypes');
 
 	switch (method) {
 		case 'GET':
-			res.status(200).json(serviceType);
+			try {
+				// Use a query to get all documents within the collection
+				console.log(serviceTypesCollection)
+				const snapshot = await getDocs(serviceTypesCollection); // Use collection reference directly
+
+				console.log(snapshot)
+				const serviceTypes: { [key: string]: ServiceType } = {};
+				// // Loop through the documents and add them to the serviceTypes object
+				snapshot.forEach((doc) => {
+					serviceTypes[doc.id] = <ServiceType>doc.data();
+				});
+
+				res.status(200).json(serviceTypes);
+			} catch (error) {
+				console.error('Error fetching service types:', error);
+				res.status(500).json({error: 'Internal Server Error'});
+			}
 			break;
 		case 'POST':
-			// Handle the POST request to add a new service type
 			try {
 				const newServiceTypeData = req.body;
-				const { label, price, priceType, variants } = newServiceTypeData;
+				const {label, price, priceType, variants} = newServiceTypeData;
 
 				// Validate the new data and perform any necessary checks here
 				if (!label || !price || !priceType) {
-					res.status(400).json({ error: 'Invalid data format' });
+					res.status(400).json({error: 'Invalid data format'});
 					return;
 				}
 
-				// Generate a new key for the service type
-				const key = generateKey();
+				// Parse the 'price' value to a number
+				const parsedPrice = parseFloat(price);
 
-				// Update the serviceType object with the new data and generated key
-				serviceType = {
-					...serviceType,
-					[key]: { label, price, priceType, variants },
-				};
+				// Check if the parsed price is a valid number
+				if (isNaN(parsedPrice)) {
+					res.status(400).json({error: 'Invalid price format'});
+					return;
+				}
 
-				res.status(200).json(serviceType); // Respond with the updated serviceType data
+				// Sanitize the label to only contain English letters and trim it
+				const sanitizedLabel = sanitizeLabel(label);
+
+				// Reference the document with the sanitized label as the key
+				const serviceTypeRef = doc(serviceTypesCollection, sanitizedLabel);
+
+				// Set the document data with the parsed price
+				await setDoc(serviceTypeRef, {
+					label,
+					price: parsedPrice,
+					priceType,
+					variants,
+				});
+
+				res.status(200).json({key: sanitizedLabel}); // Respond with the sanitized label as the key
 			} catch (error) {
-				res.status(400).json({ error: 'Invalid data format' });
+				console.error('Error creating service type:', error);
+				res.status(500).json({error: 'Internal Server Error'});
 			}
 			break;
 		default:
-			res.status(405).json({ error: 'Method not allowed' });
+			res.status(405).json({error: 'Method not allowed'});
 	}
 };
