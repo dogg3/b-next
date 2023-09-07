@@ -8,6 +8,27 @@ function sanitizeLabel(label: string) {
 	return label.replace(/[^a-zA-Z]/g, '').trim();
 }
 
+// Define a custom type for ServiceType
+type ServiceType = {
+	label: string;
+	price: number;
+	priceType: 'variants' | 'unit' | 'SQM';
+	variants?: object;
+};
+
+// Function to sort ServiceType objects based on priceType
+function sortByPriceType(serviceTypes: ServiceType[]): ServiceType[] {
+	return serviceTypes.sort((a, b) => {
+		if (a.priceType === 'SQM' && b.priceType === 'unit') {
+			return -1; // 'a' is 'SQM' and 'b' is 'unit', so 'a' comes first
+		} else if (a.priceType === 'unit' && b.priceType === 'SQM') {
+			return 1; // 'a' is 'unit' and 'b' is 'SQM', so 'b' comes first
+		} else {
+			return 0; // Either both are 'SQM' or both are 'unit', no preference
+		}
+	});
+}
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 	const {method} = req;
 	const serviceTypesCollection = collection(db, 'serviceTypes');
@@ -30,15 +51,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				});
 
 				// Sort the serviceTypesWithoutVariants based on priceType
-				const sortedServiceTypesWithoutVariants = serviceTypesWithoutVariants.sort((a, b) => {
-					if (a.priceType === 'SQM' && b.priceType === 'unit') {
-						return -1; // 'a' is 'SQM' and 'b' is 'unit', so 'a' comes first
-					} else if (a.priceType === 'unit' && b.priceType === 'SQM') {
-						return 1; // 'a' is 'unit' and 'b' is 'SQM', so 'b' comes first
-					} else {
-						return 0; // Either both are 'SQM' or both are 'unit', no preference
-					}
-				});
+				const sortedServiceTypesWithoutVariants = sortByPriceType(serviceTypesWithoutVariants);
 
 				// Concatenate the two arrays, with serviceTypesWithVariants first
 				const sortedServiceTypes = [...serviceTypesWithVariants, ...serviceTypesWithoutVariants];
