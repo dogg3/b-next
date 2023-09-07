@@ -1,5 +1,15 @@
 
+export interface ServiceTypeWithKey {
+	key: string;
+	label: string;
+	priceType: string;
+	price?: number;
+}
+
+
+
 export interface ServiceType {
+	key: string;
 	label: string;
 	price: number;
 	priceType:  'unit' | 'SQM';

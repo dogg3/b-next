@@ -30,15 +30,6 @@ export const updateDimensionsAPI = async (
 	}
 };
 
-export interface EmailData {
-	name: string;
-	email: string;
-	boatModel: string;
-	boatLength: string;
-	boatWidth: string;
-	jobs: any[]
-}
-
 export async function submitEmailAPI(data: {
 	boatLength: number,
 	jobs: [],
@@ -71,6 +62,30 @@ export async function getServiceTypesAPI(): Promise<any> {
 		return [];
 	}
 }
+
+export async function deleteServiceType(key: string): Promise<boolean> {
+	try {
+		const response = await fetch(`/api/serviceTypes/${key}`, {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json', // Set the content type
+			},
+		});
+
+		if (response.status === 200) {
+			// Service type deleted successfully
+			return true;
+		} else {
+			// Failed to delete service type
+			console.error('Failed to delete service type.');
+			return false;
+		}
+	} catch (error) {
+		console.error(error);
+		return false;
+	}
+}
+
 
 export async function createServiceType(serviceTypeData: FormServiceTypeData) {
 	try {

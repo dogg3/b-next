@@ -1,15 +1,15 @@
-import {useState, SyntheticEvent} from 'react';
-import {
-	PRICE_TYPE_SQM,
-	PRICE_TYPE_UNIT
-} from "../utils";
-import {FormServiceTypeData} from "@/types/serviceType";
-import {createServiceType} from "@/components/api";
+import React, {FC, useState, SyntheticEvent} from 'react';
+import {PRICE_TYPE_SQM, PRICE_TYPE_UNIT} from '../utils';
+import {FormServiceTypeData, ServiceTypeWithKey} from '@/types/serviceType';
+import {createServiceType} from '@/components/api';
 
+interface AddServiceTypeFormProps {
+	onAddServiceType: (serviceType: ServiceTypeWithKey) => void;
+}
 
-const AddServiceTypeForm: React.FC = () => {
+const AddServiceTypeForm: FC<AddServiceTypeFormProps> = ({onAddServiceType}) => {
 	const [formData, setFormData] = useState<FormServiceTypeData>({
-		key: "", 
+		key: '',
 		price: 0,
 		label: '',
 		priceType: PRICE_TYPE_SQM,
@@ -25,7 +25,7 @@ const AddServiceTypeForm: React.FC = () => {
 	};
 
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const {value } = e.target;
+		const {value} = e.target;
 		setFormData({
 			...formData,
 			priceType: value === PRICE_TYPE_SQM ? PRICE_TYPE_SQM : PRICE_TYPE_UNIT,
@@ -36,13 +36,21 @@ const AddServiceTypeForm: React.FC = () => {
 		e.preventDefault();
 		try {
 			const success = await createServiceType(formData);
-
 			if (success) {
 				console.log('Service type created successfully.');
+				// Pass the new service type data to the parent component
+				onAddServiceType(formData as ServiceTypeWithKey);
 				// Reset the form or perform any other actions upon successful creation
-			} else {
-				console.error('Failed to create service type.');
+				setFormData({
+					key: '',
+					price: 0,
+					label: '',
+					priceType: PRICE_TYPE_SQM,
+					variants: {},
+				});
+				return
 			}
+			console.error('Failed to create service type.');
 		} catch (error) {
 			// @ts-ignore
 			console.error(error.message);

@@ -3,8 +3,7 @@ import { getAuth, signOut } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { app } from '../firebase';
 import withAuthRedirect from '@/withAuthRedirect';
-import AddServiceTypeForm from '@/components/profile/AddServiceTypeForm';
-import ServiceTypeTable from "@/components/profile/ServiceTypeTable";
+import ServiceTypeManagement from '@/components/profile/ServiceTypeManagement';
 
 const Profile: FC = () => {
 	const auth = getAuth(app);
@@ -31,10 +30,7 @@ const Profile: FC = () => {
 						Logout
 					</button>
 				</div>
-				<div className="mt-4">
-					<AddServiceTypeForm />
-					<ServiceTypeTable />
-				</div>
+				<ServiceTypeManagement user={user} />
 			</div>
 		</div>
 	);

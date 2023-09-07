@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import {db} from '@/firebase';
-import {getDocs, doc, setDoc, collection} from 'firebase/firestore';
+import {getDocs, doc, setDoc, collection, deleteDoc} from 'firebase/firestore';
 import {ServiceType} from "@/types/serviceType";
 
 function sanitizeLabel(label: string) {
@@ -36,6 +36,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				// Sort the serviceTypesWithoutVariants based on priceType
 				snapshot.forEach((doc) => {
 					const serviceType = <ServiceType>doc.data();
+					serviceType.key = doc.id;
 					if (serviceType.variants) {
 						serviceTypesWithVariants.push(serviceType);
 						return;
@@ -102,6 +103,24 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				res.status(200).json({key: sanitizedLabel}); // Respond with the sanitized label as the key
 			} catch (error) {
 				console.error('Error creating service type:', error);
+				res.status(500).json({error: 'Internal Server Error'});
+			}
+			break;
+		case 'DELETE':
+			try {
+				const { id }= req.query; // Retrieve the key from the URL parameter
+				if (!id) {
+					res.status(400).json({ error: 'Missing key for deletion' });
+					return;
+				}
+				const key  = id[0]
+				console.log(key)
+				const serviceTypeRefToDelete = doc(serviceTypesCollection, key);
+				console.log(serviceTypeRefToDelete)
+				await deleteDoc(serviceTypeRefToDelete);
+				res.status(200).json({message: 'Service type deleted successfully'});
+			} catch (error) {
+				console.error('Error deleting service type:', error);
 				res.status(500).json({error: 'Internal Server Error'});
 			}
 			break;

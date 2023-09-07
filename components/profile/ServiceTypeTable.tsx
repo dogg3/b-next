@@ -1,29 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { getServiceTypesAPI } from '../api';
+import { Button } from '@mui/base';
+import {ServiceTypeWithKey} from "@/types/serviceType";
 
-interface ServiceType {
-	label: string;
-	priceType: string;
-	price?: number;
+interface ServiceTypeTableProps {
+	serviceTypes: ServiceTypeWithKey[];
+	handleDelete: (key: string) => void;
 }
 
-const ServiceTypeTable = () => {
-	const [serviceTypes, setServiceTypes] = useState<ServiceType[]>([]);
-	useEffect(() => {
-		async function fetchData() {
-			try {
-				const serviceTypesData = await getServiceTypesAPI();
-				// Convert the object to an array of ServiceType
-				const serviceTypesArray = Object.values(serviceTypesData) as ServiceType[];
-				setServiceTypes(serviceTypesArray);
-			} catch (error) {
-				console.log(error);
-			}
-		}
-		fetchData();
-	}, []);
-
+const ServiceTypeTable: React.FC<ServiceTypeTableProps> = ({ serviceTypes, handleDelete }) => {
 	return (
 		<TableContainer component={Paper}>
 			<Table>
@@ -32,14 +17,24 @@ const ServiceTypeTable = () => {
 						<TableCell>Label</TableCell>
 						<TableCell>Price Type</TableCell>
 						<TableCell>Price</TableCell>
+						<TableCell>Actions</TableCell> {/* Add a new column for Actions */}
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{serviceTypes.map((serviceType, index) => (
-						<TableRow key={index}>
+					{serviceTypes.map((serviceType) => (
+						<TableRow key={serviceType.key}>
 							<TableCell>{serviceType.label}</TableCell>
 							<TableCell>{serviceType.priceType}</TableCell>
 							<TableCell>{serviceType.price}</TableCell>
+							<TableCell>
+								{/* Add a Delete button for each row */}
+								<Button
+									color="secondary"
+									onClick={() => handleDelete(serviceType.key)}
+								>
+									Delete
+								</Button>
+							</TableCell>
 						</TableRow>
 					))}
 				</TableBody>
