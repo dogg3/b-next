@@ -1,4 +1,3 @@
-
 export interface ServiceTypeWithKey {
 	key: string;
 	label: string;
@@ -7,12 +6,11 @@ export interface ServiceTypeWithKey {
 }
 
 
-
 export interface ServiceType {
 	key: string;
 	label: string;
 	price: number;
-	priceType:  'unit' | 'SQM';
+	priceType: 'unit' | 'SQM';
 	variants?: ServiceType;
 }
 
@@ -43,4 +41,31 @@ export interface ServiceTypeData {
 		};
 		price?: number;
 	};
+}
+
+
+export interface Customer {
+	key: string;
+	email: string
+	boats: {
+		[key: string]: Boat
+	}
+
+	createdAt: Date
+}
+
+export interface Job {
+	status: 'pending' | 'accepted' | 'rejected'
+	serviceType: ServiceType
+	units?: number
+	createdAt: Date
+}
+
+export interface Boat {
+	model: string
+	length: number
+	width: number
+	jobs: {
+		[key: string]: Job
+	}
 }
