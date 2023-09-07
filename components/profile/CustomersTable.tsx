@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import CustomerComponent from './Customer';
 import {Customer} from "@/types/serviceType"; // Replace with the actual path to your CustomerComponent
 
 const CustomerList = () => {
