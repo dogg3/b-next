@@ -1,8 +1,8 @@
 
 export interface ServiceType {
 	label: string;
-	priceType: string;
-	price?: number;
+	price: number;
+	priceType:  'unit' | 'SQM';
 	variants?: ServiceType;
 }
 

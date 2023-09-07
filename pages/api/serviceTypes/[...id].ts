@@ -8,13 +8,6 @@ function sanitizeLabel(label: string) {
 	return label.replace(/[^a-zA-Z]/g, '').trim();
 }
 
-// Define a custom type for ServiceType
-type ServiceType = {
-	label: string;
-	price: number;
-	priceType: 'variants' | 'unit' | 'SQM';
-	variants?: object;
-};
 
 // Function to sort ServiceType objects based on priceType
 function sortByPriceType(serviceTypes: ServiceType[]): ServiceType[] {
@@ -50,10 +43,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 					serviceTypesWithoutVariants.push(serviceType);
 				});
 
-				// Sort the serviceTypesWithoutVariants based on priceType
 				const sortedServiceTypesWithoutVariants = sortByPriceType(serviceTypesWithoutVariants);
 
-				// Concatenate the two arrays, with serviceTypesWithVariants first
 				const sortedServiceTypes = [...serviceTypesWithVariants, ...serviceTypesWithoutVariants];
 
 				res.status(200).json(sortedServiceTypes);
