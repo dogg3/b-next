@@ -51,6 +51,7 @@ const ServiceTypeManagement: FC<ServiceTypeManagementProps> = ({ user }) => {
 	return (
 		<div className="mt-4">
 			<AddServiceTypeForm onAddServiceType={addServiceType} />
+			<div className={"h-[120px]"}/>
 			<ServiceTypeTable serviceTypes={serviceTypes} handleDelete={handleDelete} />
 		</div>
 	);

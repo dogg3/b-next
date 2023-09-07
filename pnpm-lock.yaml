@@ -17,6 +17,9 @@ dependencies:
   '@firebase/app':
     specifier: ^0.9.15
     version: 0.9.15
+  '@firebase/firestore':
+    specifier: ^4.1.3
+    version: 4.1.3(@firebase/app@0.9.15)
   '@mui/base':
     specifier: 5.0.0-beta.14
     version: 5.0.0-beta.14(@types/react@18.0.38)(react-dom@18.2.0)(react@18.2.0)
@@ -1884,6 +1887,25 @@ packages:
       - encoding
     dev: false
 
+  /@firebase/firestore@4.1.3(@firebase/app@0.9.15):
+    resolution: {integrity: sha512-3kw/oZrLAIHuSDTAlKguZ1e0hAgWgiBl4QQm2mIPBvBAs++iEkuv9DH2tr6rbYpT6dWtdn6jj0RN0XeqOouJRg==}
+    engines: {node: '>=10.10.0'}
+    peerDependencies:
+      '@firebase/app': 0.x
+    dependencies:
+      '@firebase/app': 0.9.15
+      '@firebase/component': 0.6.4
+      '@firebase/logger': 0.4.0
+      '@firebase/util': 1.9.3
+      '@firebase/webchannel-wrapper': 0.10.2
+      '@grpc/grpc-js': 1.8.21
+      '@grpc/proto-loader': 0.7.8
+      node-fetch: 2.6.7
+      tslib: 2.6.1
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
   /@firebase/functions-compat@0.3.5(@firebase/app-compat@0.2.15)(@firebase/app@0.9.15):
     resolution: {integrity: sha512-uD4jwgwVqdWf6uc3NRKF8cSZ0JwGqSlyhPgackyUPe+GAtnERpS4+Vr66g0b3Gge0ezG4iyHo/EXW/Hjx7QhHw==}
     peerDependencies:
@@ -2110,6 +2132,10 @@ packages:
 
   /@firebase/webchannel-wrapper@0.10.1:
     resolution: {integrity: sha512-Dq5rYfEpdeel0bLVN+nfD1VWmzCkK+pJbSjIawGE+RY4+NIJqhbUDDQjvV0NUK84fMfwxvtFoCtEe70HfZjFcw==}
+    dev: false
+
+  /@firebase/webchannel-wrapper@0.10.2:
+    resolution: {integrity: sha512-xDxhD9++451HuCv3xKBEdSYaArX9NcokODXZYH/MxGw1XFFOz7OKkTRItZ5wf6npBN/inwp8dUZCP7SpAg46yQ==}
     dev: false
 
   /@floating-ui/core@1.4.1:

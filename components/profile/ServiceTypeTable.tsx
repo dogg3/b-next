@@ -1,5 +1,14 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+	Paper,
+	Button, Typography
+} from '@mui/material';
 import {ServiceTypeWithKey} from "@/types/serviceType";
 
 interface ServiceTypeTableProps {
@@ -7,15 +16,15 @@ interface ServiceTypeTableProps {
 	handleDelete: (key: string) => void;
 }
 
-const ServiceTypeTable: React.FC<ServiceTypeTableProps> = ({ serviceTypes, handleDelete }) => {
+const ServiceTypeTable: React.FC<ServiceTypeTableProps> = ({serviceTypes, handleDelete}) => {
 	return (
 		<TableContainer component={Paper}>
 			<Table>
 				<TableHead>
 					<TableRow>
-						<TableCell>Label</TableCell>
-						<TableCell>Price Type</TableCell>
-						<TableCell>Price</TableCell>
+						<TableCell>Namn</TableCell>
+						<TableCell>Pristyp</TableCell>
+						<TableCell>Pris</TableCell>
 						<TableCell>Actions</TableCell> {/* Add a new column for Actions */}
 					</TableRow>
 				</TableHead>
@@ -31,7 +40,7 @@ const ServiceTypeTable: React.FC<ServiceTypeTableProps> = ({ serviceTypes, handl
 									color="secondary"
 									onClick={() => handleDelete(serviceType.key)}
 								>
-									Delete
+									Radera
 								</Button>
 							</TableCell>
 						</TableRow>
@@ -39,6 +48,7 @@ const ServiceTypeTable: React.FC<ServiceTypeTableProps> = ({ serviceTypes, handl
 				</TableBody>
 			</Table>
 		</TableContainer>
+
 	);
 };
 

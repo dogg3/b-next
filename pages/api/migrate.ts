@@ -1,4 +1,3 @@
-import { priceTypeToT, sqmFunc, toCurrency } from "../../components/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import {doc, setDoc} from "@firebase/firestore";
 import {db} from "@/firebase";

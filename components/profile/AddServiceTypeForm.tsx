@@ -59,10 +59,10 @@ const AddServiceTypeForm: FC<AddServiceTypeFormProps> = ({onAddServiceType}) => 
 
 	return (
 		<div className="w-full max-w-md mx-auto p-4 bg-white rounded shadow-lg">
-			<h2 className="text-2xl font-semibold mb-4">Create a New Service Type</h2>
+			<h2 className="text-2xl font-semibold mb-4">Skapa en Service</h2>
 			<form onSubmit={handleSubmit}>
 				<div className="mb-4">
-					<label htmlFor="label" className="block font-medium">Label:</label>
+					<label htmlFor="label" className="block font-medium">Namn:</label>
 					<input
 						type="text"
 						id="label"
@@ -74,7 +74,7 @@ const AddServiceTypeForm: FC<AddServiceTypeFormProps> = ({onAddServiceType}) => 
 					/>
 				</div>
 				<div className="mb-4">
-					<label className="block font-medium">Price Type:</label>
+					<label className="block font-medium">Pristyp:</label>
 					<div className="flex items-center">
 						<label className="inline-flex items-center mr-4">
 							<input
@@ -85,7 +85,7 @@ const AddServiceTypeForm: FC<AddServiceTypeFormProps> = ({onAddServiceType}) => 
 								onChange={handleCheckboxChange}
 								className="mr-2 text-blue-500"
 							/>
-							SQM
+							KVM 
 						</label>
 						<label className="inline-flex items-center">
 							<input
@@ -96,7 +96,7 @@ const AddServiceTypeForm: FC<AddServiceTypeFormProps> = ({onAddServiceType}) => 
 								onChange={handleCheckboxChange}
 								className="mr-2 text-blue-500"
 							/>
-							Unit
+							Enhet
 						</label>
 					</div>
 				</div>
@@ -116,7 +116,7 @@ const AddServiceTypeForm: FC<AddServiceTypeFormProps> = ({onAddServiceType}) => 
 						type="submit"
 						className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md focus:ring focus:ring-blue-300"
 					>
-						Create Service Type
+						Skapa service
 					</button>
 				</div>
 			</form>
