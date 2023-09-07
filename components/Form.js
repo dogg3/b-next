@@ -73,7 +73,7 @@ export const BoatForm = () => {
 	}
 
 	// This is for sqm pricetypes aka checkboxes
-	const handlePriceObject = async (event) => {
+	const handleSQMPriceTypeChange = async (event) => {
 		const value = event.target.value;
 		console.log("event target", ServiceType[event.target.value])
 		const isChecked = event.target.checked;
@@ -127,7 +127,6 @@ export const BoatForm = () => {
 				};
 				break;
 		}
-
 		updateOrCreateJob(job)
 		return true;
 	}
@@ -225,7 +224,7 @@ export const BoatForm = () => {
 				ServiceType={ServiceType}
 				jobs={jobs}
 				handleVariant={handleVariant}
-				handlePriceObject={handlePriceObject}
+				handlePriceObject={handleSQMPriceTypeChange}
 				unitCounts={unitCounts}
 				handleUnitCount={handleUnitCount}
 				priceObject={priceObject}

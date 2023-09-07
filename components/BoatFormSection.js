@@ -38,7 +38,7 @@ function BoatFormSection({
 	);
 
 	const renderServiceVariants = (key, value) => {
-		if (value.priceType === PRICE_TYPE_SQM && value.variants && value.variant != {} ) {
+		if (value.priceType === PRICE_TYPE_SQM && value.variants ) {
 			return (
 				<div key={key} className="flex flex-col">
 					{value.label}

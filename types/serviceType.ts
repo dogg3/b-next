@@ -3,6 +3,7 @@ export interface ServiceType {
 	label: string;
 	priceType: string;
 	price?: number;
+	variants?: ServiceType;
 }
 
 export interface FormServiceTypeData {

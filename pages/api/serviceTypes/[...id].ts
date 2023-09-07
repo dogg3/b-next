@@ -15,18 +15,35 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 	switch (method) {
 		case 'GET':
 			try {
-				// Use a query to get all documents within the collection
-				console.log(serviceTypesCollection)
-				const snapshot = await getDocs(serviceTypesCollection); // Use collection reference directly
+				const snapshot = await getDocs(serviceTypesCollection);
+				const serviceTypesWithVariants: ServiceType[] = [];
+				const serviceTypesWithoutVariants: ServiceType[] = [];
 
-				console.log(snapshot)
-				const serviceTypes: { [key: string]: ServiceType } = {};
-				// // Loop through the documents and add them to the serviceTypes object
+				// Sort the serviceTypesWithoutVariants based on priceType
 				snapshot.forEach((doc) => {
-					serviceTypes[doc.id] = <ServiceType>doc.data();
+					const serviceType = <ServiceType>doc.data();
+					if (serviceType.variants) {
+						serviceTypesWithVariants.push(serviceType);
+						return;
+					}
+					serviceTypesWithoutVariants.push(serviceType);
 				});
 
-				res.status(200).json(serviceTypes);
+				// Sort the serviceTypesWithoutVariants based on priceType
+				const sortedServiceTypesWithoutVariants = serviceTypesWithoutVariants.sort((a, b) => {
+					if (a.priceType === 'SQM' && b.priceType === 'unit') {
+						return -1; // 'a' is 'SQM' and 'b' is 'unit', so 'a' comes first
+					} else if (a.priceType === 'unit' && b.priceType === 'SQM') {
+						return 1; // 'a' is 'unit' and 'b' is 'SQM', so 'b' comes first
+					} else {
+						return 0; // Either both are 'SQM' or both are 'unit', no preference
+					}
+				});
+
+				// Concatenate the two arrays, with serviceTypesWithVariants first
+				const sortedServiceTypes = [...serviceTypesWithVariants, ...serviceTypesWithoutVariants];
+
+				res.status(200).json(sortedServiceTypes);
 			} catch (error) {
 				console.error('Error fetching service types:', error);
 				res.status(500).json({error: 'Internal Server Error'});
@@ -58,13 +75,25 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				// Reference the document with the sanitized label as the key
 				const serviceTypeRef = doc(serviceTypesCollection, sanitizedLabel);
 
-				// Set the document data with the parsed price
-				await setDoc(serviceTypeRef, {
+				// Remove 'variants' if it's empty or set it to an empty array if it doesn't exist
+				let sanitizedData: {
+					label: string,
+					price: number,
+					priceType: string,
+					variants?: object
+				} = {
 					label,
 					price: parsedPrice,
 					priceType,
-					variants,
-				});
+
+				};
+
+				if (variants && variants.length > 0) {
+					sanitizedData.variants = variants;
+				}
+
+				// Set the document data with the sanitized data
+				await setDoc(serviceTypeRef, sanitizedData);
 
 				res.status(200).json({key: sanitizedLabel}); // Respond with the sanitized label as the key
 			} catch (error) {
