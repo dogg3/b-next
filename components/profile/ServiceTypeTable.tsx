@@ -1,6 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { Button } from '@mui/base';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
 import {ServiceTypeWithKey} from "@/types/serviceType";
 
 interface ServiceTypeTableProps {
