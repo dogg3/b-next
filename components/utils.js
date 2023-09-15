@@ -2,6 +2,7 @@ export const BOAT_LENGTH_LABEL = "Båtlängd (meter):";
 export const BOAT_WIDTH_LABEL = "Båtbredd (meter):";
 export const BOAT_TYPE_LABEL = "Båttyp:";
 export const PRICE_TYPE_SQM = "SQM";
+export const PRICE_TYPE_VARIANTS = "variants";
 export const PRICE_TYPE_UNIT = "unit";
 
 export const priceTypeToT = (priceType) => {

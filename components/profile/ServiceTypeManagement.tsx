@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { deleteServiceType, getServiceTypesAPI } from '@/components/api';
-import { ServiceTypeWithKey } from '@/types/serviceType';
+import {ServiceType, } from '@/types/serviceType';
 import AddServiceTypeForm from './AddServiceTypeForm';
 import ServiceTypeTable from './ServiceTypeTable';
 
@@ -9,23 +9,22 @@ interface ServiceTypeManagementProps {
 }
 
 const ServiceTypeManagement: FC<ServiceTypeManagementProps> = ({ user }) => {
-	const [serviceTypes, setServiceTypes] = useState<ServiceTypeWithKey[]>([]);
-
+	const [serviceTypes, setServiceTypes] = useState<ServiceType[]>([]);
 	useEffect(() => {
 		async function fetchData() {
 			try {
 				const serviceTypesData = await getServiceTypesAPI();
 				// Convert the object to an array of ServiceType
+				console.log("hej",serviceTypesData)
 				setServiceTypes(serviceTypesData);
 			} catch (error) {
 				console.log(error);
 			}
 		}
-
 		fetchData();
 	}, []);
 
-	const addServiceType = (newServiceType: ServiceTypeWithKey) => {
+	const addServiceType = (newServiceType: ServiceType) => {
 		// Add the new service type to the state
 		setServiceTypes((prevServiceTypes) => [...prevServiceTypes, newServiceType]);
 	};

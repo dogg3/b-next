@@ -10,8 +10,10 @@ export interface ServiceType {
 	key: string;
 	label: string;
 	price: number;
-	priceType: 'unit' | 'SQM';
-	variants?: ServiceType;
+	priceType: string;
+	variants?: {
+		[key: string]: ServiceType
+	}
 }
 
 export interface FormServiceTypeData {
@@ -19,8 +21,9 @@ export interface FormServiceTypeData {
 	label: string;
 	priceType: string;
 	price: number;
-	variants?: {
+	variants: {
 		[key: string]: {
+			key: string;
 			price: number;
 			label: string;
 			priceType: string;
@@ -50,7 +53,6 @@ export interface Customer {
 	boats: {
 		[key: string]: Boat
 	}
-
 	createdAt: Date
 }
 

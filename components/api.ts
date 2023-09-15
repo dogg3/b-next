@@ -63,6 +63,8 @@ export async function getServiceTypesAPI(): Promise<any> {
 	}
 }
 
+// delete a variant
+// key/key
 export async function deleteServiceType(key: string): Promise<boolean> {
 	try {
 		const response = await fetch(`/api/serviceTypes/${key}`, {
@@ -71,7 +73,6 @@ export async function deleteServiceType(key: string): Promise<boolean> {
 				'Content-Type': 'application/json', // Set the content type
 			},
 		});
-
 		if (response.status === 200) {
 			// Service type deleted successfully
 			return true;

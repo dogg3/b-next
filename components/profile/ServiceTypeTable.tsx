@@ -9,10 +9,10 @@ import {
 	Paper,
 	Button, Typography
 } from '@mui/material';
-import {ServiceTypeWithKey} from "@/types/serviceType";
+import {ServiceType, ServiceTypeWithKey} from "@/types/serviceType";
 
 interface ServiceTypeTableProps {
-	serviceTypes: ServiceTypeWithKey[];
+	serviceTypes: ServiceType[];
 	handleDelete: (key: string) => void;
 }
 
