@@ -120,10 +120,6 @@ const UpdateModalContent: React.FC<ModalContentProps> = ({
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		console.log("updatedvariatn", updatedVariants)
-
-		// Create an updated service type object
-
-
 		let updatedServiceType: ServiceType = {
 			...serviceType,
 			label,
@@ -135,14 +131,12 @@ const UpdateModalContent: React.FC<ModalContentProps> = ({
 				price: price, // Convert the price to a number
 			};
 		}
-
 		// Include variants only if they exist
 		if (serviceType.variants) {
 			updatedServiceType.variants = updatedVariants;
 		}
 		// Call the update function with the updated service type
 		handleUpdateSubmit(updatedServiceType);
-
 		// Close the modal
 		closeModal();
 	};
