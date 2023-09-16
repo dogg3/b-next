@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { deleteServiceType, getServiceTypesAPI } from '@/components/api';
+import {deleteServiceType, getServiceTypesAPI, updateService} from '@/components/api';
 import {ServiceType, } from '@/types/serviceType';
 import AddServiceTypeForm from './AddServiceTypeForm';
 import ServiceTypeTable from './ServiceTypeTable';
@@ -46,12 +46,30 @@ const ServiceTypeManagement: FC<ServiceTypeManagementProps> = ({ user }) => {
 			console.error(error.message);
 		}
 	};
-
+	
+	const handleUpdate = async (key: string, updatedServiceType: ServiceType) => {
+		try {
+			const success = await updateService(key, updatedServiceType);
+			if (success) {
+				console.log('Service type updated successfully.');
+				setServiceTypes((prevServiceTypes) =>
+					prevServiceTypes.map((serviceType) =>
+						serviceType.key === key ? updatedServiceType : serviceType
+					)
+				);
+			} else {
+				console.error('Failed to update service type.');
+			}
+		} catch (error) {
+			// @ts-ignore
+			console.error(error.message);
+		}
+	};
 	return (
 		<div className="mt-4">
 			<AddServiceTypeForm onAddServiceType={addServiceType} />
 			<div className={"h-[120px]"}/>
-			<ServiceTypeTable handleUpdate={(key, updatedServiceType) => alert(key)} serviceTypes={serviceTypes} handleDelete={handleDelete} />
+			<ServiceTypeTable handleUpdate={handleUpdate} serviceTypes={serviceTypes} handleDelete={handleDelete} />
 		</div>
 	);
 };

@@ -1,5 +1,5 @@
 import {Dispatch, SetStateAction} from "react";
-import {FormServiceTypeData} from "@/types/serviceType";
+import {FormServiceTypeData, ServiceType} from "@/types/serviceType";
 
 export async function handleSearchAPI(searchTerm: string, setSearchResults: Dispatch<any>) {
 	try {
@@ -109,3 +109,26 @@ export async function createServiceType(serviceTypeData: FormServiceTypeData) {
 	}
 }
 
+
+export async function updateService(id: string, updatedServiceType: ServiceType) {
+	try {
+		console.log('Updating service type', JSON.stringify(updatedServiceType))
+		const response = await fetch(`/api/serviceTypes/${id}`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(updatedServiceType),
+		});
+		if (response.ok) {
+			const data = await response.json();
+			return data;
+		} else {
+			const errorData = await response.json();
+			throw new Error(errorData.error || 'Failed to update service type');
+		}
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+}

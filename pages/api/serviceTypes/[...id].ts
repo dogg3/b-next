@@ -143,7 +143,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				}
 
 				let sanitizedData: any = {
-					label: sanitizeLabel(label),
+					label: label,
 					priceType: priceType,
 				};
 
@@ -159,7 +159,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 						res.status(400).json({error: 'Invalid price format'});
 						return;
 					}
-
 					sanitizedData.price = parsedPrice;
 				}
 

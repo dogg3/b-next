@@ -85,7 +85,7 @@ const ServiceTypeTable: React.FC<ServiceTypeTableProps> = ({
 
 			{selectedServiceType && (
 				<Modal open={isModalOpen} onClose={closeModal}>
-					<ModalContent
+					<UpdateModalContent
 						serviceType={selectedServiceType}
 						handleUpdateSubmit={handleUpdateSubmit}
 						closeModal={closeModal}
@@ -102,26 +102,44 @@ interface ModalContentProps {
 	closeModal: () => void;
 }
 
-const ModalContent: React.FC<ModalContentProps> = ({
-													   serviceType,
-													   handleUpdateSubmit,
-													   closeModal,
-												   }) => {
-	console.log(serviceType)
+const UpdateModalContent: React.FC<ModalContentProps> = ({
+															 serviceType,
+															 handleUpdateSubmit,
+															 closeModal,
+														 }) => {
 	const [label, setLabel] = useState(serviceType.label);
 	const [priceType, setPriceType] = useState(serviceType.priceType);
-	const [price, setPrice] = useState(serviceType.price.toString());
+
+	let initPrice = serviceType.price ? serviceType.price : undefined
+	const [price, setPrice] = useState<number | undefined>(initPrice);
+
+	const [updatedVariants, setUpdatedVariants] = useState<{ [key: string]: ServiceType }>(
+		serviceType.variants || {}
+	);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
+		console.log("updatedvariatn", updatedVariants)
+
 		// Create an updated service type object
-		const updatedServiceType: ServiceType = {
+
+
+		let updatedServiceType: ServiceType = {
 			...serviceType,
 			label,
 			priceType,
-			price: parseFloat(price), // Convert the price to a number
-		};
+		}
+		if (price !== undefined && serviceType.price ) {
+			updatedServiceType = {
+				...updatedServiceType,
+				price: price, // Convert the price to a number
+			};
+		}
 
+		// Include variants only if they exist
+		if (serviceType.variants) {
+			updatedServiceType.variants = updatedVariants;
+		}
 		// Call the update function with the updated service type
 		handleUpdateSubmit(updatedServiceType);
 
@@ -129,6 +147,18 @@ const ModalContent: React.FC<ModalContentProps> = ({
 		closeModal();
 	};
 
+	// Handle changes to variant prices
+	const handleVariantChange = (variantKey: string, newValue: string) => {
+		setUpdatedVariants((prevVariants) => ({
+			...prevVariants,
+			[variantKey]: {
+				...prevVariants[variantKey],
+				price: parseFloat(newValue || '0'),
+			},
+		}));
+	};
+
+	// @ts-ignore
 	return (
 		<Box
 			sx={{
@@ -173,19 +203,43 @@ const ModalContent: React.FC<ModalContentProps> = ({
 						<option value="Unit">Unit</option>
 					</select>
 				</div>
-				<div className="my-5">
-					<label htmlFor="price" className="block text-sm font-medium text-gray-700">
-						Pris
-					</label>
-					<input
-						type="number"
-						id="price"
-						name="price"
-						value={price}
-						onChange={(e) => setPrice(e.target.value)}
-						className="mt-1 p-2 w-full border rounded-md"
-					/>
-				</div>
+				{/*this is when it is not a variant*/}
+				{serviceType.variants == undefined || price != undefined ?
+					(
+						<div className="my-5">
+							<label htmlFor="price" className="block text-sm font-medium text-gray-700">
+								Pris
+							</label>
+							<input
+								type="number"
+								id="price"
+								name="price"
+								value={price}
+								onChange={(e) => setPrice(parseFloat(e.target.value))}
+								className="mt-1 p-2 w-full border rounded-md"
+							/>
+						</div>
+					) : (
+						// Handle variants
+						Object.entries(updatedVariants).map(([variantKey, variant], index) => (
+							<div key={index} className="my-5">
+								<label
+									htmlFor={`variant_label_${index}`}
+									className="block text-sm font-medium text-gray-700"
+								>
+									{variant.label} pris:
+								</label>
+								<input
+									type="number"
+									id={`variant_label_${index}`}
+									name={`variant_label_${index}`}
+									value={variant.price}
+									onChange={(e) => handleVariantChange(variantKey, e.target.value)}
+									className="mt-1 p-2 w-full border rounded-md"
+								/>
+							</div>
+						))
+					)}
 				<button
 					type="submit"
 					className="mt-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
