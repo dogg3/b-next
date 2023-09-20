@@ -3,12 +3,14 @@ import {deleteServiceType, getServiceTypesAPI, updateService} from '@/components
 import {ServiceType, } from '@/types/serviceType';
 import AddServiceTypeForm from './AddServiceTypeForm';
 import ServiceTypeTable from './ServiceTypeTable';
+import { useRouter } from 'next/router'; // Import useRouter
 
 interface ServiceTypeManagementProps {
 	user: any; // Replace with your user type
 }
 
 const ServiceTypeManagement: FC<ServiceTypeManagementProps> = ({ user }) => {
+
 	const [serviceTypes, setServiceTypes] = useState<ServiceType[]>([]);
 	useEffect(() => {
 		async function fetchData() {
@@ -65,10 +67,12 @@ const ServiceTypeManagement: FC<ServiceTypeManagementProps> = ({ user }) => {
 			console.error(error.message);
 		}
 	};
+
 	return (
 		<div className="mt-4">
 			<AddServiceTypeForm onAddServiceType={addServiceType} />
 			<div className={"h-[120px]"}/>
+
 			<ServiceTypeTable handleUpdate={handleUpdate} serviceTypes={serviceTypes} handleDelete={handleDelete} />
 		</div>
 	);
