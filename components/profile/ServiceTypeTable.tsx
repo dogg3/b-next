@@ -25,17 +25,31 @@ const ServiceTypeTable: React.FC<ServiceTypeTableProps> = ({
 															   handleDelete,
 															   handleUpdate,
 														   }) => {
-	const [isModalOpen, setModalOpen] = useState(false);
+	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+	const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
 	const [selectedServiceType, setSelectedServiceType] = useState<ServiceType | null>(null);
 
 	const openUpdateModal = (serviceType: ServiceType) => {
 		setSelectedServiceType(serviceType);
-		setModalOpen(true);
+		setUpdateModalOpen(true);
+	};
+
+	const openDeleteModal = (serviceType: ServiceType) => {
+		setSelectedServiceType(serviceType);
+		setDeleteModalOpen(true);
 	};
 
 	const closeModal = () => {
 		setSelectedServiceType(null);
-		setModalOpen(false);
+		setDeleteModalOpen(false);
+		setUpdateModalOpen(false);
+	};
+
+	const handleDeleteConfirm = () => {
+		if (selectedServiceType) {
+			handleDelete(selectedServiceType.key);
+			closeModal();
+		}
 	};
 
 	const handleUpdateSubmit = (updatedServiceType: ServiceType) => {
@@ -64,16 +78,10 @@ const ServiceTypeTable: React.FC<ServiceTypeTableProps> = ({
 								<TableCell>{serviceType.priceType}</TableCell>
 								<TableCell>{serviceType.price}</TableCell>
 								<TableCell>
-									<Button
-										color="secondary"
-										onClick={() => handleDelete(serviceType.key)}
-									>
+									<Button color="secondary" onClick={() => openDeleteModal(serviceType)}>
 										Radera
 									</Button>
-									<Button
-										color="primary"
-										onClick={() => openUpdateModal(serviceType)}
-									>
+									<Button color="primary" onClick={() => openUpdateModal(serviceType)}>
 										Uppdatera
 									</Button>
 								</TableCell>
@@ -84,13 +92,43 @@ const ServiceTypeTable: React.FC<ServiceTypeTableProps> = ({
 			</TableContainer>
 
 			{selectedServiceType && (
-				<Modal open={isModalOpen} onClose={closeModal}>
-					<UpdateModalContent
-						serviceType={selectedServiceType}
-						handleUpdateSubmit={handleUpdateSubmit}
-						closeModal={closeModal}
-					/>
-				</Modal>
+				<>
+					{/* Delete Modal */}
+					<Modal open={isDeleteModalOpen} onClose={closeModal}>
+						<Box
+							sx={{
+								position: 'absolute',
+								top: '50%',
+								left: '50%',
+								transform: 'translate(-50%, -50%)',
+								bgcolor: 'background.paper',
+								boxShadow: 24,
+								p: 4,
+								minWidth: 400,
+							}}
+						>
+							<Typography variant="h6">Är du säker?</Typography>
+							<Typography>Vill du verkligen ta bort denna tjänstetyp?</Typography>
+							<Button onClick={handleDeleteConfirm} color="secondary">
+								Ja, ta bort
+							</Button>
+							<Button onClick={closeModal} color="primary">
+								Avbryt
+							</Button>
+						</Box>
+					</Modal>
+
+					{/* Update Modal */}
+					<Modal open={isUpdateModalOpen} onClose={closeModal}>
+						{/* Render your update modal content here */}
+						{/* You can use the existing UpdateModalContent component or create a new one */}
+						<UpdateModalContent
+							serviceType={selectedServiceType}
+							handleUpdateSubmit={handleUpdateSubmit}
+							closeModal={closeModal}
+						/>
+					</Modal>
+				</>
 			)}
 		</div>
 	);
